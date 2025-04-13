@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>rA | TEDAŞ Dağıtım Tesislerinin Deplase/İptaline İlişkin Uygulanacak Usul ve Esaslar Testi</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(120deg, #f0f4f8, #d9e2ec);
+            margin: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-bottom: 20px;
+        }
+
+		.quiz-container {
+			background: #ffffff;
+			padding: 50px;
+			border-radius: 24px;
+			box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+			max-width: 100%;
+			width: 70%;  /* PC'de genişliği %70 yapıyoruz */
+			box-sizing: border-box;
+			margin: 20px;
+			margin-left: 20%;  /* Sol taraftan %10 boşluk bırakarak sağa kaydırıyoruz */
+		}
+
+        .question {
+            font-size: 24px;
+            margin-bottom: 30px;
+            font-weight: 600;
+            color: #102a43;
+            text-align: center;
+        }
+
+        .options {
+            list-style: none;
+            padding: 0;
+        }
+
+        .options li {
+            margin-bottom: 18px;
+        }
+
+        .options button {
+            width: 100%;
+            text-align: left;
+            background: #e3ebf6;
+            border: none;
+            border-radius: 10px;
+            padding: 16px 24px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        .options button:hover {
+            background: #c7d7ea;
+            transform: scale(1.01);
+        }
+
+        .options button.correct {
+            background-color: #38a169 !important;
+            color: white;
+            font-weight: bold;
+        }
+
+        .options button.incorrect {
+            background-color: #e53e3e !important;
+            color: white;
+            font-weight: bold;
+        }
+
+        .result {
+            margin-top: 30px;
+            font-weight: bold;
+            font-size: 20px;
+            text-align: center;
+        }
+
+        .result.correct {
+            color: green;
+        }
+
+        .result.incorrect {
+            color: red;
+        }
+
+        #nextBtn {
+            margin-top: 35px;
+            background: #2b6cb0;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: none;
+            float: right;
+        }
+
+        #nextBtn:hover {
+            background: #2c5282;
+        }
+
+        #scoreBox {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: #2b6cb0;
+        }
+
+        footer {
+            margin-top: 60px;
+            text-align: center;
+            font-size: 15px;
+            color: #555;
+        }
+
+		.question-navigation {
+			position: fixed;
+			left: 0;
+			top: 0;
+			bottom: 0;
+			width: 140px; /* Genişliği küçülttük */
+			overflow-y: auto;
+			background: #e2e8f0;
+			padding: 20px;
+			box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+			z-index: 1;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: flex-start;
+		}
+
+		.question-navigation a,
+		.question-navigation h3 {
+			text-align: center; /* Link ve başlıkları ortalar */
+			width: 100%;
+		}
+
+		.question-navigation a {
+			text-decoration: none;
+			font-size: 18px;
+			margin-bottom: 20px;
+			color: white;  /* Yazı rengini beyaz yapalım */
+			background-color: #38a169;  /* Yeşil arka plan rengi */
+			padding: 10px 20px;  /* Düğmeye biraz iç boşluk ekleyelim */
+			border-radius: 8px;  /* Kenarlarını yuvarlayalım */
+			font-weight: bold;
+			display: block;  /* Linkin tüm alanını tıklanabilir yapar */
+			text-align: center;  /* Yazıyı ortalar */
+			transition: background-color 0.3s ease;  /* Hover efekti eklerken yumuşak geçiş sağlar */
+		}
+
+		.question-navigation h3 {
+			font-size: 18px;
+			margin-bottom: 10px;
+		}
+
+        .question-navigation a:hover {
+            background-color: #2f855a;
+        }
+
+        .question-list {
+            padding-left: 20px;
+            font-size: 14px;
+            line-height: 1.6;
+            list-style: none;
+        }
+
+        .question-list li {
+            background: white;
+            padding: 6px 10px;
+            border-radius: 6px;
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            margin-bottom: 6px;
+        }
+
+        .question-list li.active {
+            font-weight: bold;
+            color: #2b6cb0;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+                overflow-y: auto;
+                align-items: flex-start;
+                padding: 20px;
+            }
+
+            .quiz-container {
+                margin-left: 0 !important;
+                margin-top: 20px;
+                padding: 24px;
+                width: 100%;
+                max-width: 100%;
+            }
+
+			.question-navigation {
+				position: static;
+				width: 100%;  /* Mobil görünümde genişlik %100 olacak */
+				box-shadow: none;
+				margin-bottom: 20px;
+				padding: 10px;
+				margin-top: 10px;
+			}
+
+            .question-navigation a {
+                width: auto;
+                padding: 8px 16px;
+                font-size: 16px;
+            }
+
+            .question-list {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 6px;
+                padding-left: 0;
+                justify-content: center;
+            }
+
+            .question-list li {
+                flex: 0 0 auto;
+                font-size: 14px;
+                padding: 6px 10px;
+                border-radius: 6px;
+                box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+                cursor: pointer;
+            }
+
+            .question-list li.active {
+                font-weight: bold;
+                color: #2b6cb0;
+            }
+
+            .question {
+                font-size: 20px;
+            }
+
+            .options button {
+                font-size: 16px;
+                padding: 12px 18px;
+            }
+
+            #nextBtn {
+                float: none;
+                display: block;
+                margin: 30px auto 0 auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .question-navigation {
+                width: 100%;
+                padding: 8px;
+            }
+
+            .question-navigation a {
+                font-size: 14px;
+                padding: 8px 12px;
+            }
+
+            .options button {
+                font-size: 14px;
+                padding: 12px;
+            }
+
+            .question {
+                font-size: 18px;
+            }
+
+            #nextBtn {
+                padding: 12px 24px;
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="question-navigation">
+        <a href="index.html">Ana Sayfa</a>
+        <h3>Tüm Sorular</h3>
+        <ol id="questionList" class="question-list"></ol>
+    </div>
+
+    <div class="quiz-container">
+        <div id="quiz">
+            <div class="question" id="question"></div>
+            <ul class="options" id="options"></ul>
+            <button id="nextBtn" type="button">Sonraki Soru</button>
+            <div class="result" id="result"></div>
+            <div id="scoreBox"></div>
+        </div>
+        <footer>
+            Bu test <strong>TEDAŞ Dağıtım Tesislerinin Deplase/İptaline İlişkin Uygulanacak Usul ve Esaslar</strong> temel alınarak hazırlanmıştır.<br />
+            [ ramazan.bozkurt@tedas.gov.tr ]
+        </footer>
+    </div>
+
+    <script>
+        const harfler = ["A", "B", "C", "D"];
+		const questions = [
+		  { question: "Bu Usul ve Esasların amacı nedir?", options: ["Elektrik tesislerinde bakım yapılması", "Yeni elektrik tesislerinin kurulması", "Dağıtım tesislerinin deplase/iptali ve taşınmazların değerlendirilmesine dair işlemler", "Elektrik faturalarının tahsilatının yapılması"], answer: 2 },
+		  { question: "Bu Usul ve Esaslar hangi tesisleri kapsam dışı bırakır?", options: ["Kamuya ait elektrik tesislerini", "OSB mülkiyetindeki ve kullanıcı mülkiyetindeki devir olunmamış tesisleri", "Köylerdeki alçak gerilim tesislerini", "TEDAŞ mülkiyetindeki tüm tesisleri"], answer: 1 },
+		  { question: "Başvuruların TEDAŞ'a iletilme süresi kaç iş günüdür?", options: ["3 iş günü", "5 iş günü", "7 iş günü", "10 iş günü"], answer: 2 },
+		  { question: "Deplase/iptal komisyonu kaç kişiden oluşur?", options: ["2", "3", "4", "5"], answer: 1 },
+		  { question: "TEDAŞ lehine irtifak hakkı tescili hangi durumda yapılır?", options: ["Bağımsız bölüm belirlenemediğinde", "Kira sözleşmesi yapıldığında", "Mülkiyet tescili mümkün olmadığında", "Kamulaştırma tamamlandığında"], answer: 2 },
+		  { question: "Usul ve Esasların dayanağı aşağıdakilerden hangisidir?", options: ["Elektrik İç Tesisler Yönetmeliği", "2942 sayılı Kamulaştırma Kanunu", "6446 sayılı Elektrik Piyasası Kanunu ve İşletme Hakkı Devir Sözleşmesi", "Belediyeler Kanunu"], answer: 2 },
+		  { question: "Deplase/iptal komisyonu hangi kurum tarafından oluşturulur?", options: ["EPDK", "Elektrik dağıtım şirketi", "TEDAŞ", "Enerji Bakanlığı"], answer: 2 },
+		  { question: "Deplase/iptal talepleri öncelikle kim tarafından değerlendirilir?", options: ["TEDAŞ", "Elektrik dağıtım şirketi", "EPDK", "Kıymet takdir komisyonu"], answer: 1 },
+		  { question: "Raporun ekinde hangi belge yer almaz?", options: ["Takyidatlı tapu kaydı", "Uydu görüntüsü", "Elektrik faturası", "Fotoğraf"], answer: 2 },
+		  { question: "Deplase/iptal talebinin reddedilmesi halinde ne yapılır?", options: ["Talep sahibi projeyi yeniden sunar", "Rapor düzenlenip onaydan sonra karar bildirilir", "Talep sahibi doğrudan dava açar", "İlgili tesis yıkılır"], answer: 1 },
+		  { question: "Kamulaştırma işlemleri kimin tarafından yürütülür?", options: ["Elektrik dağıtım şirketi", "Talep sahibi", "EPDK", "TEDAŞ"], answer: 3 },
+		  { question: "Kıymet takdir komisyonu en az kaç kişiden oluşur?", options: ["2", "3", "4", "5"], answer: 1 },
+		  { question: "Deplasesi talep edilen tesisin bulunduğu taşınmazın kamulaştırması kesinleştikten sonra 5 yıl geçmişse hangi durum geçerli olur?", options: ["Tesis yeniden projelendirilir", "Devir işlemi yapılamaz", "Fark bedel TEDAŞ lehine ise talep sahibince ödenir", "Elektrik dağıtımı durdurulur"], answer: 2 },
+		  { question: "Deplase edilecek yer yapı içindeyse ne yapılır?", options: ["Kira sözleşmesi yapılır", "Yönetim planına transformatör yeri olarak eklenir ve ortak giderlerden muaf olur", "Tesisin yapımı iptal edilir", "TEDAŞ mülkiyeti tapuya tescil edilir"], answer: 1 },
+		  { question: "TEDAŞ tarafından gönderilen protokol ne kadar sürede imzalanıp geri iletilmelidir?", options: ["7 iş günü", "15 gün", "30 takvim günü", "45 takvim günü"], answer: 2 },
+		  { question: "Protokol onaylanmadan hangi işlem yapılamaz?", options: ["Tesisin iptali", "Devir", "Kamulaştırma", "Herhangi bir işlem"], answer: 3 },
+		  { question: "Deplase işleminin yapılması kararı alınmışsa en geç kaç gün içinde izin başvurusu yapılmalıdır?", options: ["15 gün", "30 takvim günü", "60 gün", "3 ay"], answer: 1 },
+		  { question: "Başvurunun eksiksiz yapılması halinde deplase/iptal sonucu en fazla kaç iş günü içinde sonuçlandırılır?", options: ["10 iş günü", "15 iş günü", "25 iş günü", "30 iş günü"], answer: 2 },
+		  { question: "Deplase komisyonunun üçüncü üyesi hangi durumda TEDAŞ tarafından atanır?", options: ["Talep sahibi başvuru yapmazsa", "TEDAŞ raporu onaylamazsa", "Elektrik dağıtım şirketi üye bildirmezse", "EPDK onay vermezse"], answer: 2 },
+		  { question: "Deplase taleplerinde alternatif yerin bildirilmesi kimin sorumluluğundadır?", options: ["TEDAŞ", "Elektrik dağıtım şirketi", "Kıymet takdir komisyonu", "Talep sahibi"], answer: 3 },
+		  { question: "Kıymet takdir raporunun hazırlanma süresi nedir?", options: ["10 iş günü", "15 iş günü", "20 iş günü", "30 iş günü"], answer: 1 },
+		  { question: "Dağıtım tesisi bağımsız bölüme deplase edilecekse bu bölümün tapuda nasıl tescil edilmesi gerekir?", options: ["Hisseli mülkiyet olarak", "Geçici irtifak hakkı ile", "TEDAŞ adına tescilli ve ortak giderlerden muaf", "Yönetim planı dışında"], answer: 2 },
+		  { question: "TEDAŞ lehine kira şerhi hangi durumda tescil edilir?", options: ["Mülkiyet veya irtifak hakkı tescili mümkün olmadığında", "Bağımsız bölüm tanımsızsa", "Kıymet takdiri tamamlanmadığında", "Deplase reddedildiğinde"], answer: 0 },
+		  { question: "Kamu kurumları tarafından yapılan deplase talebinde hangi giderler kamu kurumu tarafından karşılanır?", options: ["Yalnızca imar planı düzenlemesi", "Yalnızca kamulaştırma bedeli", "Kamulaştırma, vergi, resim, harç giderleri", "Hiçbiri"], answer: 2 },
+		  { question: "Deplase işlemleri hangi belge olmadan yapılamaz?", options: ["Tapu kaydı", "TEDAŞ protokol onayı", "Uydu görüntüsü", "Fotoğraf"], answer: 1 },
+		  { question: "Raporların çeyrek dönemlerde TEDAŞ’a bildirilme zamanı hangisidir?", options: ["Her ayın 1'i", "Her ayın 15'i", "Yılın her çeyreğini takip eden ayın 15’i", "Her yılın sonunda"], answer: 2 },
+		  { question: "Yürürlük maddesine göre bu Usul ve Esaslar hangi onay ile yürürlüğe girer?", options: ["Enerji Bakanlığı", "EPDK", "TEDAŞ Yönetim Kurulu", "Elektrik dağıtım şirketleri"], answer: 2 },
+		  { question: "Dağıtım tesisinin deplase edileceği taşınmazın belediyeye ait olması halinde en az kaç yıl kullanım izni alınmalıdır?", options: ["10 yıl", "15 yıl", "20 yıl", "25 yıl"], answer: 3 },
+		  { question: "TEDAŞ tarafından hazırlanan protokol kaç gün içinde talep sahibine gönderilir?", options: ["3 iş günü", "7 iş günü", "10 takvim günü", "30 takvim günü"], answer: 0 },
+		  { question: "TEDAŞ’a ulaşmayan protokollerin durumu nedir?", options: ["Yeniden değerlendirmeye alınır", "Geçersiz sayılır", "Mahkemeye taşınır", "Kamuya duyurulur"], answer: 1 },
+		  { question: "Raporun TEDAŞ yetkili makamlarınca onaylanması neyi sağlar?", options: ["Proje kabulünü", "Kamulaştırmanın başlamasını", "Raporun geçerlilik kazanmasını", "İmar planı düzenlemesini"], answer: 2 },
+		  { question: "Deplase işleminin başlatılması için gerekli izinler en geç ne zaman alınmalıdır?", options: ["Protokol imzasından sonra 3 gün içinde", "Protokol tesliminden sonra 30 takvim günü içinde", "TEDAŞ onayından sonra 60 gün içinde", "Başvuru tarihinden itibaren 90 gün içinde"], answer: 1 },
+		  { question: "Yürürlükten kaldırılan önceki esaslar hangi TEDAŞ kararlarıyla belirlenmişti?", options: ["9-181 ve 16-354 sayılı kararlarla", "6446 sayılı Kanunla", "EPDK yönetmelikleriyle", "İlgili bakanlık genelgeleriyle"], answer: 0 },
+		  { question: "Bu Usul ve Esasların hükümleri kim tarafından yürütülür?", options: ["Enerji Bakanı", "TEDAŞ Hukuk Müşaviri", "TEDAŞ Genel Müdürü", "Elektrik Dağıtım Şirketi"], answer: 2 },
+		  { question: "Kamulaştırma işlemleri tamamlanan dağıtım tesisinin talebi kamu kurumunca yapılmışsa taşınmazın devri ne zaman yapılır?", options: ["Talep yapıldığı anda", "İmar planı onayından sonra", "Proje onayı ve geçici kabulden sonra", "Yargı kararı ile"], answer: 2 },
+		  { question: "Elektrik dağıtım tesislerinin bulunduğu mevcut yerin tahmini kamulaştırma maliyeti neyle kıyaslanır?", options: ["İmar planı değişikliği maliyetiyle", "Tesisin işletme süresiyle", "Deplase işlemine ait tesis bedeliyle", "Elektrik tüketim oranıyla"], answer: 2 },
+		  { question: "Geçici deplase durumu varsa bu ne şekilde raporlanır?", options: ["Mülakatla", "Gerekçeleri belirtilerek", "Mahkeme kararıyla", "Tapu devriyle"], answer: 1 },
+		  { question: "Talep sahibinden teminat alınması hangi aşamada mümkündür?", options: ["Tesis kabulünden sonra", "Kıymet takdirinden sonra", "Proje onayından önce", "Rapor tesliminden sonra"], answer: 2 },
+		  { question: "Kıymet takdir komisyonu hangi durumda görevlendirilir?", options: ["Her deplase başvurusunda", "Rapor onayından sonra kıymet takdiri gerekliyse", "Elektrik dağıtım şirketi isterse", "EPDK onayından sonra"], answer: 1 },
+		  { question: "Kıymet takdirinde hangi faktör dikkate alınmaz?", options: ["Taşınmazın yapılaşma şartları", "Çevresel faktörler", "Bölgenin nüfusu", "İmar planındaki tahsis amacı"], answer: 2 },
+		  { question: "Tevhit sonucu oluşacak taşınmazın bedeli belirlenirken ne dikkate alınmaz?", options: ["Taşınmazın cinsi", "Yönetici bilgileri", "Yapılaşma şartları", "Çevresel faktörler"], answer: 1 },
+		  { question: "İrtifak/intifa hakkının terkin edilmesi hangi şarta bağlıdır?", options: ["EPDK iznine", "Kamulaştırma yapılmasına", "TEDAŞ tarafından belirlenen bedelin ödenmesine", "Bağımsız bölümün ayrılmasına"], answer: 2 },
+		  { question: "Kamu kurumlarınca yapılacak deplase taleplerinde protokol nasıl uygulanır?", options: ["Sözlü anlaşma ile", "Yalnızca TEDAŞ tarafından", "Karşılıklı imzalanan protokol kapsamında", "EPDK kararına göre"], answer: 2 },
+		  { question: "Kira şerhi tescili ne zaman uygulanabilir?", options: ["İmar planı iptalinde", "İrtifak hakkı tescili mümkün değilse", "Kamulaştırma yapılmadıysa", "Muvafakat alınamazsa"], answer: 1 },
+		  { question: "TEDAŞ tarafından yürütülecek işlemlerden hangisi bu Usul ve Esaslara göre yapılamaz?", options: ["Kamulaştırma işlemleri", "Kira sözleşmesi hazırlamak", "Deplase raporu onayı", "İmar planı revizyonu"], answer: 3 },
+		  { question: "Deplase işleminin sürecini izleyen raporlar ne zaman TEDAŞ'a gönderilir?", options: ["Yıl sonunda", "Protokol imzalanınca", "Yılın her çeyreğini takip eden ayın 15. günü", "İmar planı tamamlanınca"], answer: 2 },
+		  { question: "İmar planında dağıtım tesisi olarak ayrılmış alan neyle belgelenmelidir?", options: ["Kadastral harita", "Tapu belgesi", "Belediye meclis/encümen kararı", "Kıymet takdir raporu"], answer: 2 },
+		  { question: "TEDAŞ tarafından yapılacak devir işlemi hangi belge ile geçerli olur?", options: ["Tapu kaydı", "Protokol", "Onaylı karar", "Rapor"], answer: 2 },
+		  { question: "Deplase/iptal raporunun ekinde hangi hat türü hariç tutulur?", options: ["AG hatlar", "OG hatlar", "AG/OG hatlar", "AG/OG hatlar hariç yer tespit tutanağı"], answer: 3 },
+		  { question: "TEDAŞ’a iletilmeyecek başvuru durumu aşağıdakilerden hangisidir?", options: ["Eksik evrakla yapılan başvuru", "Maliyet limit altında kalan başvuru", "EPDK onaylı başvuru", "Talep sahibinin kamu kurumu olduğu başvuru"], answer: 0 },
+		  { question: "TEDAŞ'ın lehine hak tesis edilen alanlar hangileri olabilir?", options: ["Sadece kiralık yerler", "İrtifak, intifa veya iz bedelli kira alanları", "Sadece kamulaştırılmış alanlar", "Yalnızca tapulu mülkler"], answer: 1 },
+		  { question: "TEDAŞ adına tescil edilmiş bir mülkiyetin korunması hangi durumda sona erer?", options: ["Tesisin geçici kabulü yapıldığında", "Yeni yer kamulaştırıldığında", "Protokol imzalandığında", "Tesis yerinden kaldırıldığında"], answer: 3 },
+		  { question: "Protokol, TEDAŞ tarafından iadeli taahhütlü olarak ne zaman gönderilir?", options: ["Başvurudan 5 gün sonra", "Raporun düzenlenmesini takip eden 3 iş günü içinde", "Başvuru belgeleri onaylandıktan sonra 7 iş günü içinde", "Kıymet takdirinden sonra"], answer: 1 },
+		  { question: "TEDAŞ protokolü aldıktan sonra talep sahibi kaç gün içinde geri göndermelidir?", options: ["15 takvim günü", "10 iş günü", "30 takvim günü", "20 iş günü"], answer: 2 },
+		  { question: "Protokol geçerli sayılmadan hangi işlem başlatılamaz?", options: ["İmar planı düzenlemesi", "Kamulaştırma harcı ödemesi", "Deplase süreci", "Şartname oluşturulması"], answer: 2 },
+		  { question: "Kıymet takdir komisyonu kaç belgeye dayanarak rapor hazırlar?", options: ["En az 2", "Sadece tapu kaydı", "En az 4 belge", "Sadece kroki"], answer: 2 },
+		  { question: "Kıymet takdirinde yer alan belgelerden biri aşağıdakilerden hangisidir?", options: ["Vergi levhası", "Rayiçlik belgeleri", "Enerji izin belgesi", "Yönetim planı"], answer: 1 },
+		  { question: "Tevhit işleminde taşınmazların birleştirilmesi neyle yapılır?", options: ["Elektrik projesiyle", "Tapu şerhi ile", "Tapu tescili ile", "Vaziyet planı ile"], answer: 2 },
+		  { question: "Dağıtım tesisinin ekonomik ömrü ne zaman değerlendirilir?", options: ["Talep sahibinin beyanı ile", "Deplase/iptal komisyonu tarafından", "Elektrik dağıtım şirketi kararı ile", "Yargı kararı ile"], answer: 1 },
+		  { question: "Şebeke bütünlüğü hangi aşamada değerlendirilir?", options: ["Devir işleminde", "Başvuru tesliminde", "Deplase talebinin teknik analizinde", "Tesis yıkımında"], answer: 2 },
+		  { question: "Tesisin mevcut envanterinin kullanımı kim tarafından değerlendirilir?", options: ["Elektrik mühendisi", "Dağıtım şirketi", "Deplase komisyonu", "TEDAŞ yönetimi"], answer: 2 },
+		  { question: "İmar planı değişikliği kararı kimden alınmalıdır?", options: ["İl Özel İdaresi", "Belediye Meclisi veya Encümeni", "Tapu Kadastro Müdürlüğü", "TEDAŞ"], answer: 1 },
+		  { question: "Talep sahibi kamu kurumuysa bedel ödemesi gereken kalem nedir?", options: ["Trafo ücreti", "Vergi, resim, harç ve kamulaştırma bedeli", "Kira bedeli", "İzin başvuru harcı"], answer: 1 },
+		  { question: "Talep sahibinin muvafakatname sunamaması neye sebep olur?", options: ["İmar düzenlemesi yapılır", "Başvuru geçici kabul alır", "Deplase/iptal talebi işleme alınmaz", "Kamulaştırma kararı verilir"], answer: 2 },
+		  { question: "Talep sahibine devredilebilmesi için hangi hakların kaldırılması gerekir?", options: ["Elektrik bağlantısı", "İmar sınırı", "İrtifak, intifa, şerh vb. haklar", "Rayiç değer farkı"], answer: 2 },
+		  { question: "TEDAŞ adına kira şerhi tescili hangi durumlarda kullanılır?", options: ["İrtifak hakkı mümkün olmadığında", "Yönetim planı onaylanmadığında", "Talep sahibi tüzel kişilik ise", "Tesis süresi 10 yılı aşmıyorsa"], answer: 0 },
+		  { question: "Talep sahibinin kendi mülkü için hazırlayacağı proje hangi işlemden sonra yapılır?", options: ["Protokol onayı", "Kamulaştırma kesinleşmesi", "Elektrik projesi onayı", "Tescile esas harita onayı"], answer: 2 },
+		  { question: "Dağıtım tesisinin bulunduğu taşınmaz kamuya tahsisli ise öncelik kimdedir?", options: ["TEDAŞ", "Belediye", "Kamu kurumu", "EPDK"], answer: 2 },
+		];
+
+        let currentQuestion = 0;
+        let score = 0;
+        const questionEl = document.getElementById("question");
+        const optionsEl = document.getElementById("options");
+        const resultEl = document.getElementById("result");
+        const nextBtn = document.getElementById("nextBtn");
+        const scoreBox = document.getElementById("scoreBox");
+
+        function loadQuestion() {
+            const allNavItems = document.querySelectorAll('#questionList li');
+            allNavItems.forEach((item, idx) => {
+                item.classList.remove('active');
+                if (idx === currentQuestion) {
+                    item.classList.add('active');
+                }
+            });
+
+            const questionList = document.getElementById("questionList");
+            if (questionList && questionList.children.length === 0) {
+                questions.forEach((q, i) => {
+                    const li = document.createElement("li");
+                    li.textContent = `Soru ${i + 1}`;
+                    li.onclick = () => {
+                        currentQuestion = i;
+                        loadQuestion();
+                    };
+                    questionList.appendChild(li);
+                });
+            }
+
+            const q = questions[currentQuestion];
+            questionEl.textContent = `Soru ${currentQuestion + 1}: ${q.question}`;
+            optionsEl.innerHTML = "";
+            resultEl.textContent = "";
+            nextBtn.style.display = "none";
+            scoreBox.textContent = `Puan: ${score} / ${questions.length}`;
+
+            q.options.forEach((opt, index) => {
+                const li = document.createElement("li");
+                const btn = document.createElement("button");
+                btn.textContent = `${harfler[index]}) ${opt}`;
+                btn.onclick = () => checkAnswer(index, btn);
+                li.appendChild(btn);
+                optionsEl.appendChild(li);
+            });
+        }
+
+        function checkAnswer(selected, btnClicked) {
+            const q = questions[currentQuestion];
+            const buttons = document.querySelectorAll(".options button");
+
+            buttons.forEach((btn, idx) => {
+                btn.disabled = true;
+                btn.classList.remove("correct", "incorrect");
+                if (idx === q.answer) {
+                    btn.classList.add("correct");
+                }
+            });
+
+            if (selected === q.answer) {
+                score++;
+                resultEl.textContent = "Doğru cevap!";
+                resultEl.className = "result correct";
+            } else {
+                resultEl.textContent = "Yanlış cevap.";
+                resultEl.className = "result incorrect";
+                btnClicked.classList.add("incorrect");
+            }
+
+            nextBtn.style.display = "inline-block";
+            scoreBox.textContent = `Puan: ${score} / ${questions.length}`;
+        }
+
+        nextBtn.onclick = () => {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+            } else {
+                questionEl.textContent = "Test tamamlandı!";
+                optionsEl.innerHTML = "";
+                nextBtn.style.display = "none";
+                resultEl.textContent = `Tebrikler! ${score} / ${questions.length} doğru cevap verdiniz.`;
+                resultEl.className = "result correct";
+            }
+        };
+
+        loadQuestion();
+    </script>
+</body>
+
+</html>

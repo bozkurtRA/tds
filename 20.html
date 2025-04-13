@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>rA | TEDAŞ Kişisel Verileri Koruma Komisyonu Çalışma Usul ve Esasları Testi</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(120deg, #f0f4f8, #d9e2ec);
+            margin: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-bottom: 20px;
+        }
+
+		.quiz-container {
+			background: #ffffff;
+			padding: 50px;
+			border-radius: 24px;
+			box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+			max-width: 100%;
+			width: 70%;  /* PC'de genişliği %70 yapıyoruz */
+			box-sizing: border-box;
+			margin: 20px;
+			margin-left: 20%;  /* Sol taraftan %10 boşluk bırakarak sağa kaydırıyoruz */
+		}
+
+        .question {
+            font-size: 24px;
+            margin-bottom: 30px;
+            font-weight: 600;
+            color: #102a43;
+            text-align: center;
+        }
+
+        .options {
+            list-style: none;
+            padding: 0;
+        }
+
+        .options li {
+            margin-bottom: 18px;
+        }
+
+        .options button {
+            width: 100%;
+            text-align: left;
+            background: #e3ebf6;
+            border: none;
+            border-radius: 10px;
+            padding: 16px 24px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        .options button:hover {
+            background: #c7d7ea;
+            transform: scale(1.01);
+        }
+
+        .options button.correct {
+            background-color: #38a169 !important;
+            color: white;
+            font-weight: bold;
+        }
+
+        .options button.incorrect {
+            background-color: #e53e3e !important;
+            color: white;
+            font-weight: bold;
+        }
+
+        .result {
+            margin-top: 30px;
+            font-weight: bold;
+            font-size: 20px;
+            text-align: center;
+        }
+
+        .result.correct {
+            color: green;
+        }
+
+        .result.incorrect {
+            color: red;
+        }
+
+        #nextBtn {
+            margin-top: 35px;
+            background: #2b6cb0;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: none;
+            float: right;
+        }
+
+        #nextBtn:hover {
+            background: #2c5282;
+        }
+
+        #scoreBox {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: #2b6cb0;
+        }
+
+        footer {
+            margin-top: 60px;
+            text-align: center;
+            font-size: 15px;
+            color: #555;
+        }
+
+		.question-navigation {
+			position: fixed;
+			left: 0;
+			top: 0;
+			bottom: 0;
+			width: 140px; /* Genişliği küçülttük */
+			overflow-y: auto;
+			background: #e2e8f0;
+			padding: 20px;
+			box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+			z-index: 1;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: flex-start;
+		}
+
+		.question-navigation a,
+		.question-navigation h3 {
+			text-align: center; /* Link ve başlıkları ortalar */
+			width: 100%;
+		}
+
+		.question-navigation a {
+			text-decoration: none;
+			font-size: 18px;
+			margin-bottom: 20px;
+			color: white;  /* Yazı rengini beyaz yapalım */
+			background-color: #38a169;  /* Yeşil arka plan rengi */
+			padding: 10px 20px;  /* Düğmeye biraz iç boşluk ekleyelim */
+			border-radius: 8px;  /* Kenarlarını yuvarlayalım */
+			font-weight: bold;
+			display: block;  /* Linkin tüm alanını tıklanabilir yapar */
+			text-align: center;  /* Yazıyı ortalar */
+			transition: background-color 0.3s ease;  /* Hover efekti eklerken yumuşak geçiş sağlar */
+		}
+
+		.question-navigation h3 {
+			font-size: 18px;
+			margin-bottom: 10px;
+		}
+
+        .question-navigation a:hover {
+            background-color: #2f855a;
+        }
+
+        .question-list {
+            padding-left: 20px;
+            font-size: 14px;
+            line-height: 1.6;
+            list-style: none;
+        }
+
+        .question-list li {
+            background: white;
+            padding: 6px 10px;
+            border-radius: 6px;
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            margin-bottom: 6px;
+        }
+
+        .question-list li.active {
+            font-weight: bold;
+            color: #2b6cb0;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+                overflow-y: auto;
+                align-items: flex-start;
+                padding: 20px;
+            }
+
+            .quiz-container {
+                margin-left: 0 !important;
+                margin-top: 20px;
+                padding: 24px;
+                width: 100%;
+                max-width: 100%;
+            }
+
+			.question-navigation {
+				position: static;
+				width: 100%;  /* Mobil görünümde genişlik %100 olacak */
+				box-shadow: none;
+				margin-bottom: 20px;
+				padding: 10px;
+				margin-top: 10px;
+			}
+
+            .question-navigation a {
+                width: auto;
+                padding: 8px 16px;
+                font-size: 16px;
+            }
+
+            .question-list {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 6px;
+                padding-left: 0;
+                justify-content: center;
+            }
+
+            .question-list li {
+                flex: 0 0 auto;
+                font-size: 14px;
+                padding: 6px 10px;
+                border-radius: 6px;
+                box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+                cursor: pointer;
+            }
+
+            .question-list li.active {
+                font-weight: bold;
+                color: #2b6cb0;
+            }
+
+            .question {
+                font-size: 20px;
+            }
+
+            .options button {
+                font-size: 16px;
+                padding: 12px 18px;
+            }
+
+            #nextBtn {
+                float: none;
+                display: block;
+                margin: 30px auto 0 auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .question-navigation {
+                width: 100%;
+                padding: 8px;
+            }
+
+            .question-navigation a {
+                font-size: 14px;
+                padding: 8px 12px;
+            }
+
+            .options button {
+                font-size: 14px;
+                padding: 12px;
+            }
+
+            .question {
+                font-size: 18px;
+            }
+
+            #nextBtn {
+                padding: 12px 24px;
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="question-navigation">
+        <a href="index.html">Ana Sayfa</a>
+        <h3>Tüm Sorular</h3>
+        <ol id="questionList" class="question-list"></ol>
+    </div>
+
+    <div class="quiz-container">
+        <div id="quiz">
+            <div class="question" id="question"></div>
+            <ul class="options" id="options"></ul>
+            <button id="nextBtn" type="button">Sonraki Soru</button>
+            <div class="result" id="result"></div>
+            <div id="scoreBox"></div>
+        </div>
+        <footer>
+            Bu test <strong>TEDAŞ Kişisel Verileri Koruma Komisyonu Çalışma Usul ve Esasları</strong> temel alınarak hazırlanmıştır.<br />
+            [ ramazan.bozkurt@tedas.gov.tr ]
+        </footer>
+    </div>
+
+    <script>
+        const harfler = ["A", "B", "C", "D"];
+		const questions = [
+		  { question: "TEDAŞ Kişisel Verileri Koruma Komisyonu Çalışma Usul ve Esaslarının amacı aşağıdakilerden hangisidir?", options: ["TEDAŞ personelinin disiplin kurallarını belirlemek", "Kurumun teknik altyapı yatırım planlamasını düzenlemek", "Elektrik dağıtım hizmetlerinin kalitesini artırmak", "Komisyonun çalışma usul ve esasları ile görev, yetki ve sorumluluklarını belirlemek"], answer: 3 },
+		  { question: "Bu Usul ve Esaslar aşağıdakilerden hangisini kapsar?", options: ["Tüm kamu kurumlarının veri işleme faaliyetlerini", "Sadece özel nitelikli verilerin işlenmesini", "Kurum dışı danışmanlık hizmetlerini", "Kurumun kişisel verilerin korunmasına ilişkin faaliyetlerini"], answer: 3 },
+		  { question: "TEDAŞ Kişisel Verileri Koruma Komisyonu Usul ve Esasları hangi kanuna dayanılarak hazırlanmıştır?", options: ["5651 Sayılı Kanun", "657 Sayılı Devlet Memurları Kanunu", "5070 Sayılı Elektronik İmza Kanunu", "6698 Sayılı Kişisel Verilerin Korunması Kanunu"], answer: 3 },
+		  { question: "Aşağıdakilerden hangisi “açık rıza” tanımına en uygun ifadedir?", options: ["Verinin rızaya gerek kalmadan işlenmesi", "İlgili kişiden sessiz onay alınması", "Bilgilendirmeye dayanan ve özgür iradeyle açıklanan onay", "Verinin şifrelenerek güvence altına alınması"], answer: 2 },
+		  { question: "Anonim hale getirme ifadesi aşağıdakilerden hangisini ifade eder?", options: ["Verilerin arşivlenmesi", "Verinin güvenlik protokolüne alınması", "Verinin sadece yetkili kişiler tarafından erişilebilir olması", "Verinin kimliği belirli ya da belirlenebilir bir kişiye bağlanamayacak hâle getirilmesi"], answer: 3 },
+		  { question: "“Kişisel veri envanteri” aşağıdakilerden hangisidir?", options: ["Personelin özlük dosyası kayıtları", "Kurum dışı firmalardan alınan danışmanlık raporları", "Saklama süreleriyle birlikte işlenen kişisel verileri gösteren belge", "Kurumun satın alma işlemlerine ait liste"], answer: 2 },
+		  { question: "“Kurum” ifadesi bu Usul ve Esaslarda hangi kuruluşu tanımlar?", options: ["Türkiye Elektrik Kurumu", "Enerji Piyasası Düzenleme Kurumu", "TEDAŞ – Türkiye Elektrik Dağıtım Anonim Şirketi", "Kişisel Verileri Koruma Kurulu"], answer: 2 },
+		  { question: "Aşağıdakilerden hangisi özel nitelikli kişisel veri olarak kabul edilir?", options: ["Ad soyad", "Cep telefonu numarası", "Kan grubu", "E-posta adresi"], answer: 2 },
+		  { question: "Komisyon üyeleri aşağıdakilerden hangisi tarafından belirlenir?", options: ["Kurum Başkanı", "İnsan Kaynakları Dairesi", "TEDAŞ Genel Müdürü", "İç Denetim Birimi"], answer: 2 },
+		  { question: "Komisyonun sekretarya hizmetlerini yürütmekten sorumlu birim hangisidir?", options: ["Hukuk Müşavirliği", "Bilgi Teknolojileri Dairesi", "İnsan Kaynakları Dairesi Başkanlığı", "İç Denetim Birimi"], answer: 2 },
+		  { question: "Kişisel Verileri Koruma Komisyonu kararlarını nasıl alır?", options: ["Salt çoğunlukla", "Oybirliği ile", "Üçte iki çoğunlukla", "Üyelerden birinin onayıyla"], answer: 0 },
+		  { question: "Komisyon kararlarının uygulanmasından kim sorumludur?", options: ["Genel Müdür Yardımcısı", "Komisyon Başkanı", "Komisyon Sekreteryası", "Veri sorumlusu birim yöneticisi"], answer: 3 },
+		  { question: "Veri Sorumluları Sicil Bilgi Sistemi (VERBİS) kayıt işlemleri kim tarafından yürütülür?", options: ["İlgili kişi", "İç Denetim Birimi", "Kurumsal Veri Sorumlusu", "İnsan Kaynakları"], answer: 2 },
+		  { question: "Kişisel veri ihlali durumunda hangi süre içinde KVK Kurumu’na bildirim yapılmalıdır?", options: ["24 saat", "48 saat", "72 saat", "1 hafta"], answer: 2 },
+		  { question: "Kişisel veri işleme faaliyetlerinin hukuka uygunluğu kim tarafından izlenir ve denetlenir?", options: ["Komisyon", "Birim yöneticileri", "TEDAŞ Genel Müdürlüğü", "İç Denetim Birimi"], answer: 0 },
+		  { question: "Kişisel veri işleme envanteri hangi sıklıkla güncellenmelidir?", options: ["Her 5 yılda", "Gerektiğinde", "Yılda bir", "3 ayda bir"], answer: 2 },
+		  { question: "Komisyon toplantıları en az kaç ayda bir yapılır?", options: ["Her ay", "2 ayda bir", "3 ayda bir", "6 ayda bir"], answer: 2 },
+		  { question: "Komisyon toplantı yeter sayısı aşağıdakilerden hangisidir?", options: ["Tüm üyelerin katılımı", "Salt çoğunluk", "Oybirliği", "Üçte iki çoğunluk"], answer: 1 },
+		  { question: "Kişisel veri işleme faaliyetlerinin mevzuata uygun yürütülmesini sağlamak için hangi faaliyet yapılmaz?", options: ["Farkındalık artırıcı eğitimler", "Politika ve prosedür hazırlama", "Veri minimizasyonu uygulama", "Veri tabanı reklamcılığı"], answer: 3 },
+		  { question: "Komisyon kararları aşağıdakilerden hangisine aykırı olamaz?", options: ["Kurumsal politikaya", "TEDAŞ tüzüğüne", "İlgili mevzuata", "Komisyon başkanının görüşüne"], answer: 2 },
+		  { question: "Kişisel verilerin hukuka aykırı olarak işlenmesi halinde uygulanacak yaptırımlar hangi kanunda düzenlenmiştir?", options: ["5237 Sayılı Türk Ceza Kanunu", "4857 Sayılı İş Kanunu", "193 Sayılı Gelir Vergisi Kanunu", "357 Sayılı Enerji Piyasası Kanunu"], answer: 0 },
+		  { question: "Kurum içinde veri sorumlusu kimdir?", options: ["Genel Müdür", "Komisyon Başkanı", "Veri işleyen her birim yöneticisi", "Bilgi İşlem Şube Müdürü"], answer: 2 },
+		  { question: "Aydınlatma yükümlülüğü kapsamında aşağıdakilerden hangisi yapılmalıdır?", options: ["Kişisel veri doğrudan alınır", "Veri sahibine bilgi verilir", "İzin alınmadan veri paylaşılır", "Kurum içi yazışma yapılır"], answer: 1 },
+		  { question: "Komisyon, Kurum içi hangi faaliyetlerin kişisel verilerle ilgisini denetler?", options: ["Yalnızca insan kaynakları işlemleri", "Tüm kişisel veri işleme faaliyetleri", "Sadece sözleşme süreçleri", "Eğitim planlamaları"], answer: 1 },
+		  { question: "Veri sorumluları, işledikleri kişisel verileri hangi sistemde bildirmelidir?", options: ["TÜİK", "E-Devlet", "VERBİS", "UYAP"], answer: 2 },
+		  { question: "Aşağıdakilerden hangisi kişisel verinin silinmesi olarak kabul edilir?", options: ["Verinin kağıda yazılması", "Veriye erişimin kalıcı olarak engellenmesi", "Verinin veri tabanına taşınması", "Şifreleme yapılması"], answer: 1 },
+		  { question: "Veri sahibinin kişisel verileri üzerindeki haklarını kullanması için hangi yöntem esas alınır?", options: ["Sözlü beyan", "Telefonla başvuru", "Yazılı veya kayıtlı elektronik ortam", "Yöneticinin onayı"], answer: 2 },
+		  { question: "Komisyonun yıllık faaliyet raporu hangi makama sunulur?", options: ["TEDAŞ Yönetim Kurulu", "Genel Müdürlük Makamı", "KVKK Kurulu", "Enerji Bakanlığı"], answer: 1 },
+		  { question: "Komisyon, eğitim faaliyetlerini ne amaçla düzenler?", options: ["Birim içi denetim için", "Faturalandırma için", "Veri işleme farkındalığını artırmak için", "Arşivleme eğitimi için"], answer: 2 },
+		  { question: "Aşağıdakilerden hangisi kişisel verilerin işlenme şartlarından biridir?", options: ["Veri sahibinin açık rızasının bulunması", "Verinin kamuoyuna açıklanması", "Verinin yurtdışına aktarılması", "Verinin sınırsız saklanması"], answer: 0 },
+		  { question: "Komisyon kararları en geç ne kadar sürede yazılı hale getirilmelidir?", options: ["7 gün", "15 gün", "1 ay", "Derhal"], answer: 1 },
+		  { question: "Kurum bünyesinde kişisel veri işleyen çalışanlar hangi yükümlülüğü taşır?", options: ["Verileri saklamak", "Verileri raporlamak", "Gizliliği sağlamak ve yetkisiz paylaşmamak", "Yöneticiden izin almak"], answer: 2 },
+		  { question: "Komisyonun veri sorumlularına önerdiği politika ve prosedürlerin amacı nedir?", options: ["Performans değerlendirmesi yapmak", "Gizliliği sağlamak ve riskleri azaltmak", "Maaş belirlemek", "Şirket içi haberleşmeyi artırmak"], answer: 1 },
+		  { question: "TEDAŞ kişisel verilerin korunmasına ilişkin politikasını kamuoyuna nerede duyurur?", options: ["Gazetede ilan", "Resmi Gazete", "TEDAŞ internet sitesi", "Personel bilgilendirme toplantısı"], answer: 2 },
+		  { question: "Veri ihlali sonrası yapılması gereken ilk işlem nedir?", options: ["Kurum içi bildirim", "KVKK'ya bildirim", "İlgili kişiye bilgi verilmesi", "Verinin silinmesi"], answer: 1 },
+		  { question: "Kişisel verilerin korunması eğitimi kimler için zorunludur?", options: ["Sadece yöneticiler", "Tüm TEDAŞ personeli", "Dış hizmet alımı yapanlar", "Sözleşmeli çalışanlar"], answer: 1 },
+		  { question: "Kurum dışı veri paylaşımında aşağıdakilerden hangisi zorunludur?", options: ["Genel Müdür onayı", "Yöneticinin bilgisi", "Açık rıza alınması", "Veri silinmesi"], answer: 2 },
+		  { question: "Komisyon kararları hangi kayıt sistemiyle arşivlenir?", options: ["Yazılı defter", "Excel listesi", "EBYS sistemi", "VERBİS"], answer: 2 },
+		  { question: "Kurumun veri işleme faaliyetleri hangi ilkeye dayanmalıdır?", options: ["Gizlilik", "Verimlilik", "Dürüstlük", "Şeffaflık ve hesap verilebilirlik"], answer: 3 },
+		  { question: "Komisyon kararlarına itiraz süresi kaç gündür?", options: ["7 gün", "10 gün", "15 gün", "30 gün"], answer: 1 },
+		];
+
+        let currentQuestion = 0;
+        let score = 0;
+        const questionEl = document.getElementById("question");
+        const optionsEl = document.getElementById("options");
+        const resultEl = document.getElementById("result");
+        const nextBtn = document.getElementById("nextBtn");
+        const scoreBox = document.getElementById("scoreBox");
+
+        function loadQuestion() {
+            const allNavItems = document.querySelectorAll('#questionList li');
+            allNavItems.forEach((item, idx) => {
+                item.classList.remove('active');
+                if (idx === currentQuestion) {
+                    item.classList.add('active');
+                }
+            });
+
+            const questionList = document.getElementById("questionList");
+            if (questionList && questionList.children.length === 0) {
+                questions.forEach((q, i) => {
+                    const li = document.createElement("li");
+                    li.textContent = `Soru ${i + 1}`;
+                    li.onclick = () => {
+                        currentQuestion = i;
+                        loadQuestion();
+                    };
+                    questionList.appendChild(li);
+                });
+            }
+
+            const q = questions[currentQuestion];
+            questionEl.textContent = `Soru ${currentQuestion + 1}: ${q.question}`;
+            optionsEl.innerHTML = "";
+            resultEl.textContent = "";
+            nextBtn.style.display = "none";
+            scoreBox.textContent = `Puan: ${score} / ${questions.length}`;
+
+            q.options.forEach((opt, index) => {
+                const li = document.createElement("li");
+                const btn = document.createElement("button");
+                btn.textContent = `${harfler[index]}) ${opt}`;
+                btn.onclick = () => checkAnswer(index, btn);
+                li.appendChild(btn);
+                optionsEl.appendChild(li);
+            });
+        }
+
+        function checkAnswer(selected, btnClicked) {
+            const q = questions[currentQuestion];
+            const buttons = document.querySelectorAll(".options button");
+
+            buttons.forEach((btn, idx) => {
+                btn.disabled = true;
+                btn.classList.remove("correct", "incorrect");
+                if (idx === q.answer) {
+                    btn.classList.add("correct");
+                }
+            });
+
+            if (selected === q.answer) {
+                score++;
+                resultEl.textContent = "Doğru cevap!";
+                resultEl.className = "result correct";
+            } else {
+                resultEl.textContent = "Yanlış cevap.";
+                resultEl.className = "result incorrect";
+                btnClicked.classList.add("incorrect");
+            }
+
+            nextBtn.style.display = "inline-block";
+            scoreBox.textContent = `Puan: ${score} / ${questions.length}`;
+        }
+
+        nextBtn.onclick = () => {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+            } else {
+                questionEl.textContent = "Test tamamlandı!";
+                optionsEl.innerHTML = "";
+                nextBtn.style.display = "none";
+                resultEl.textContent = `Tebrikler! ${score} / ${questions.length} doğru cevap verdiniz.`;
+                resultEl.className = "result correct";
+            }
+        };
+
+        loadQuestion();
+    </script>
+</body>
+
+</html>

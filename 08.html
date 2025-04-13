@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>rA | Elektrik Tesisleri Proje Yönetmeliği Testi</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(120deg, #f0f4f8, #d9e2ec);
+            margin: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-bottom: 20px;
+        }
+
+		.quiz-container {
+			background: #ffffff;
+			padding: 50px;
+			border-radius: 24px;
+			box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+			max-width: 100%;
+			width: 70%;  /* PC'de genişliği %70 yapıyoruz */
+			box-sizing: border-box;
+			margin: 20px;
+			margin-left: 20%;  /* Sol taraftan %10 boşluk bırakarak sağa kaydırıyoruz */
+		}
+
+        .question {
+            font-size: 24px;
+            margin-bottom: 30px;
+            font-weight: 600;
+            color: #102a43;
+            text-align: center;
+        }
+
+        .options {
+            list-style: none;
+            padding: 0;
+        }
+
+        .options li {
+            margin-bottom: 18px;
+        }
+
+        .options button {
+            width: 100%;
+            text-align: left;
+            background: #e3ebf6;
+            border: none;
+            border-radius: 10px;
+            padding: 16px 24px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        .options button:hover {
+            background: #c7d7ea;
+            transform: scale(1.01);
+        }
+
+        .options button.correct {
+            background-color: #38a169 !important;
+            color: white;
+            font-weight: bold;
+        }
+
+        .options button.incorrect {
+            background-color: #e53e3e !important;
+            color: white;
+            font-weight: bold;
+        }
+
+        .result {
+            margin-top: 30px;
+            font-weight: bold;
+            font-size: 20px;
+            text-align: center;
+        }
+
+        .result.correct {
+            color: green;
+        }
+
+        .result.incorrect {
+            color: red;
+        }
+
+        #nextBtn {
+            margin-top: 35px;
+            background: #2b6cb0;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: none;
+            float: right;
+        }
+
+        #nextBtn:hover {
+            background: #2c5282;
+        }
+
+        #scoreBox {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: #2b6cb0;
+        }
+
+        footer {
+            margin-top: 60px;
+            text-align: center;
+            font-size: 15px;
+            color: #555;
+        }
+
+		.question-navigation {
+			position: fixed;
+			left: 0;
+			top: 0;
+			bottom: 0;
+			width: 140px; /* Genişliği küçülttük */
+			overflow-y: auto;
+			background: #e2e8f0;
+			padding: 20px;
+			box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+			z-index: 1;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: flex-start;
+		}
+
+		.question-navigation a,
+		.question-navigation h3 {
+			text-align: center; /* Link ve başlıkları ortalar */
+			width: 100%;
+		}
+
+		.question-navigation a {
+			text-decoration: none;
+			font-size: 18px;
+			margin-bottom: 20px;
+			color: white;  /* Yazı rengini beyaz yapalım */
+			background-color: #38a169;  /* Yeşil arka plan rengi */
+			padding: 10px 20px;  /* Düğmeye biraz iç boşluk ekleyelim */
+			border-radius: 8px;  /* Kenarlarını yuvarlayalım */
+			font-weight: bold;
+			display: block;  /* Linkin tüm alanını tıklanabilir yapar */
+			text-align: center;  /* Yazıyı ortalar */
+			transition: background-color 0.3s ease;  /* Hover efekti eklerken yumuşak geçiş sağlar */
+		}
+
+		.question-navigation h3 {
+			font-size: 18px;
+			margin-bottom: 10px;
+		}
+
+        .question-navigation a:hover {
+            background-color: #2f855a;
+        }
+
+        .question-list {
+            padding-left: 20px;
+            font-size: 14px;
+            line-height: 1.6;
+            list-style: none;
+        }
+
+        .question-list li {
+            background: white;
+            padding: 6px 10px;
+            border-radius: 6px;
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            margin-bottom: 6px;
+        }
+
+        .question-list li.active {
+            font-weight: bold;
+            color: #2b6cb0;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+                overflow-y: auto;
+                align-items: flex-start;
+                padding: 20px;
+            }
+
+            .quiz-container {
+                margin-left: 0 !important;
+                margin-top: 20px;
+                padding: 24px;
+                width: 100%;
+                max-width: 100%;
+            }
+
+			.question-navigation {
+				position: static;
+				width: 100%;  /* Mobil görünümde genişlik %100 olacak */
+				box-shadow: none;
+				margin-bottom: 20px;
+				padding: 10px;
+				margin-top: 10px;
+			}
+
+            .question-navigation a {
+                width: auto;
+                padding: 8px 16px;
+                font-size: 16px;
+            }
+
+            .question-list {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 6px;
+                padding-left: 0;
+                justify-content: center;
+            }
+
+            .question-list li {
+                flex: 0 0 auto;
+                font-size: 14px;
+                padding: 6px 10px;
+                border-radius: 6px;
+                box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+                cursor: pointer;
+            }
+
+            .question-list li.active {
+                font-weight: bold;
+                color: #2b6cb0;
+            }
+
+            .question {
+                font-size: 20px;
+            }
+
+            .options button {
+                font-size: 16px;
+                padding: 12px 18px;
+            }
+
+            #nextBtn {
+                float: none;
+                display: block;
+                margin: 30px auto 0 auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .question-navigation {
+                width: 100%;
+                padding: 8px;
+            }
+
+            .question-navigation a {
+                font-size: 14px;
+                padding: 8px 12px;
+            }
+
+            .options button {
+                font-size: 14px;
+                padding: 12px;
+            }
+
+            .question {
+                font-size: 18px;
+            }
+
+            #nextBtn {
+                padding: 12px 24px;
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="question-navigation">
+        <a href="index.html">Ana Sayfa</a>
+        <h3>Tüm Sorular</h3>
+        <ol id="questionList" class="question-list"></ol>
+    </div>
+
+    <div class="quiz-container">
+        <div id="quiz">
+            <div class="question" id="question"></div>
+            <ul class="options" id="options"></ul>
+            <button id="nextBtn" type="button">Sonraki Soru</button>
+            <div class="result" id="result"></div>
+            <div id="scoreBox"></div>
+        </div>
+        <footer>
+            Bu test <strong>Elektrik Tesisleri Proje Yönetmeliği</strong> temel alınarak hazırlanmıştır.<br />
+            [ ramazan.bozkurt@tedas.gov.tr ]
+        </footer>
+    </div>
+
+    <script>
+        const harfler = ["A", "B", "C", "D"];
+		const questions = [
+		  { question: "Yönetmeliğin amacı aşağıdakilerden hangisidir?", options: ["Elektrik tesislerine fiyat standardı getirmek", "Elektrik tesislerinin uygunluk ve güvenlik esaslarına göre projelendirilmesini sağlamak", "Tüketicilerin elektrik talebini ölçmek", "Elektrik faturalarının denetimini yapmak"], answer: 1 },
+		  { question: "Aşağıdakilerden hangisi bu Yönetmelik kapsamı dışındadır?", options: ["Güneş elektrik santrali (GES)", "Rüzgar elektrik santrali (RES)", "Emniyet Genel Müdürlüğüne ait özel elektrik tesisleri", "Kojenerasyon tesisleri"], answer: 2 },
+		  { question: "Yönetmelik hangi yasal dayanaklara göre hazırlanmıştır?", options: ["Elektrik İç Tesisleri Yönetmeliği", "6446 sayılı Elektrik Piyasası Kanunu ve 1 sayılı Cumhurbaşkanlığı Kararnamesi", "Kamu İhale Kanunu", "EPDK Uygulama Yönetmeliği"], answer: 1 },
+		  { question: "“POB” kısaltması neyi ifade eder?", options: ["Proje Onay Birimi", "Proje Operasyon Bölgesi", "Proje Onay Belgesi", "Proje Onarım Birimi"], answer: 0 },
+		  { question: "Elektrik depolama ünitesi (EDÜ) nedir?", options: ["Elektriği yalnızca ileten iletim hattı sistemidir", "Elektriği sisteme bağlayan inverter cihazıdır", "Bağımsız olarak enerji depolayabilen ve tekrar sisteme verebilen birimdir", "Elektrik trafosunun alternatif adıdır"], answer: 2 },
+		  { question: "“Ön proje” aşağıdakilerden hangisini kapsamaz?", options: ["Şema ve teknik çizimler", "Hesap ve keşifler", "CE belgesi", "Tesisin genel özellikleri"], answer: 2 },
+		  { question: "Proje tasarımlarında aşağıdaki kaynaklardan hangisi esas alınmaz?", options: ["Türk Standartları", "CEN ve IEC standartları", "IEEE teknik dokümanları", "Çevre Kanunu Yönetmeliği"], answer: 3 },
+		  { question: "CE işareti taşıyan malzeme neyi ifade eder?", options: ["Avrupa’da üretildiğini", "Standartlara uygun üretildiğini ve güvenli olduğunu", "TSE tarafından onaylandığını", "Sadece ithal ürün olduğunu"], answer: 1 },
+		  { question: "Serbest olarak çalışan mühendislerden istenen belge aşağıdakilerden hangisidir?", options: ["Diploma fotokopisi", "SMM belgesi", "SGK dökümü", "Ruhsat belgesi"], answer: 1 },
+		  { question: "Elektronik haberleşme mühendislerinin elektrik projeleri düzenleyebilmesi için hangi belgeyi alması gerekir?", options: ["Proje Kabul Belgesi", "Elektrik Tüketim Yetki Belgesi", "Elektrik 1 kV Altı/Üstü Tesisler SMM Belgesi", "CE Uygunluk Belgesi"], answer: 2 },
+		  { question: "Yetkilendirme tablosuna uygun şekilde proje kabulü yapma yetkisi öncelikli olarak kimdedir?", options: ["EPDK", "Bakanlık", "TEİAŞ", "OSB yönetimi"], answer: 1 },
+		  { question: "Proje onayı yapılmayan tesisler için aşağıdakilerden hangisi doğrudur?", options: ["Projelendirme devam edebilir", "İşletmeye alınabilir", "Mühürlenerek sistemden ayrılabilir", "İhale yapılabilir"], answer: 2 },
+		  { question: "Projelerin hazırlanmasında dikkate alınması gerekenlerden biri değildir:", options: ["Yerinde inceleme", "Güncel standartlar", "Mevcut mevzuatlar", "Piyasa fiyat listesi"], answer: 3 },
+		  { question: "Eksik belge tespiti sonrası proje sahibine tanınan düzeltme süresi kaç iş günüdür?", options: ["10 iş günü", "7 iş günü", "15 iş günü", "30 takvim günü"], answer: 2 },
+		  { question: "Proje onay süreci eksiksiz belgelerle başvurduğunda en fazla kaç iş günü sürebilir?", options: ["7 iş günü", "10 iş günü", "15 iş günü", "20 iş günü"], answer: 2 },
+		  { question: "Onaylanmış bir projenin geçerlilik süresi kaç yıldır?", options: ["3 yıl", "4 yıl", "5 yıl", "Süresizdir"], answer: 2 },
+		  { question: "Onaylı projede değişiklik yapılacaksa aşağıdakilerden hangisi gereklidir?", options: ["Bakanlık yazısı", "Tadilat projesi veya uygun görüş", "Şirketin iç kararı", "İnşaat ruhsatı"], answer: 1 },
+		  { question: "Hangi tesis türleri için “ön proje onayı” alınabilir?", options: ["Lisanssız üretim tesisleri", "Önlisanslı üretim ve depolamalı üretim tesisleri", "İletim tesisleri", "Trafo merkezleri"], answer: 1 },
+		  { question: "Tesis yapımına başlanabilmesi için aşağıdakilerden hangisi gereklidir?", options: ["Bağlantı anlaşması", "CE Belgesi", "Lisans alınması", "Topoğrafik rapor"], answer: 2 },
+		  { question: "Proje teknik sorumluluğu öncelikle kimdedir?", options: ["Tüketici", "POB mühendisi", "Proje hazırlayan mühendis", "TEDAŞ"], answer: 2 },
+		  { question: "HES’lerin kapsam dışı bölümlerine ilişkin yetki kimdedir?", options: ["TEİAŞ", "EPDK", "DSİ", "Bakanlık"], answer: 2 },
+		  { question: "İade edilen bir projenin tekrar sunulması durumunda hangi Yönetmelik hükümleri uygulanır?", options: ["2009 tarihli eski yönetmelik", "Mevzuat dışı hükümler", "Güncel Elektrik Tesisleri Proje Yönetmeliği", "Elektrik İç Tesisleri Yönetmeliği"], answer: 2 }
+		];
+
+        let currentQuestion = 0;
+        let score = 0;
+        const questionEl = document.getElementById("question");
+        const optionsEl = document.getElementById("options");
+        const resultEl = document.getElementById("result");
+        const nextBtn = document.getElementById("nextBtn");
+        const scoreBox = document.getElementById("scoreBox");
+
+        function loadQuestion() {
+            const allNavItems = document.querySelectorAll('#questionList li');
+            allNavItems.forEach((item, idx) => {
+                item.classList.remove('active');
+                if (idx === currentQuestion) {
+                    item.classList.add('active');
+                }
+            });
+
+            const questionList = document.getElementById("questionList");
+            if (questionList && questionList.children.length === 0) {
+                questions.forEach((q, i) => {
+                    const li = document.createElement("li");
+                    li.textContent = `Soru ${i + 1}`;
+                    li.onclick = () => {
+                        currentQuestion = i;
+                        loadQuestion();
+                    };
+                    questionList.appendChild(li);
+                });
+            }
+
+            const q = questions[currentQuestion];
+            questionEl.textContent = `Soru ${currentQuestion + 1}: ${q.question}`;
+            optionsEl.innerHTML = "";
+            resultEl.textContent = "";
+            nextBtn.style.display = "none";
+            scoreBox.textContent = `Puan: ${score} / ${questions.length}`;
+
+            q.options.forEach((opt, index) => {
+                const li = document.createElement("li");
+                const btn = document.createElement("button");
+                btn.textContent = `${harfler[index]}) ${opt}`;
+                btn.onclick = () => checkAnswer(index, btn);
+                li.appendChild(btn);
+                optionsEl.appendChild(li);
+            });
+        }
+
+        function checkAnswer(selected, btnClicked) {
+            const q = questions[currentQuestion];
+            const buttons = document.querySelectorAll(".options button");
+
+            buttons.forEach((btn, idx) => {
+                btn.disabled = true;
+                btn.classList.remove("correct", "incorrect");
+                if (idx === q.answer) {
+                    btn.classList.add("correct");
+                }
+            });
+
+            if (selected === q.answer) {
+                score++;
+                resultEl.textContent = "Doğru cevap!";
+                resultEl.className = "result correct";
+            } else {
+                resultEl.textContent = "Yanlış cevap.";
+                resultEl.className = "result incorrect";
+                btnClicked.classList.add("incorrect");
+            }
+
+            nextBtn.style.display = "inline-block";
+            scoreBox.textContent = `Puan: ${score} / ${questions.length}`;
+        }
+
+        nextBtn.onclick = () => {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+            } else {
+                questionEl.textContent = "Test tamamlandı!";
+                optionsEl.innerHTML = "";
+                nextBtn.style.display = "none";
+                resultEl.textContent = `Tebrikler! ${score} / ${questions.length} doğru cevap verdiniz.`;
+                resultEl.className = "result correct";
+            }
+        };
+
+        loadQuestion();
+    </script>
+</body>
+
+</html>

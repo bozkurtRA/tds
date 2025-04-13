@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>rA | Elektrik Kuvvetli Akım Tesisleri Yönetmeliği Testi</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(120deg, #f0f4f8, #d9e2ec);
+            margin: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-bottom: 20px;
+        }
+
+		.quiz-container {
+			background: #ffffff;
+			padding: 50px;
+			border-radius: 24px;
+			box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+			max-width: 100%;
+			width: 70%;  /* PC'de genişliği %70 yapıyoruz */
+			box-sizing: border-box;
+			margin: 20px;
+			margin-left: 20%;  /* Sol taraftan %10 boşluk bırakarak sağa kaydırıyoruz */
+		}
+
+        .question {
+            font-size: 24px;
+            margin-bottom: 30px;
+            font-weight: 600;
+            color: #102a43;
+            text-align: center;
+        }
+
+        .options {
+            list-style: none;
+            padding: 0;
+        }
+
+        .options li {
+            margin-bottom: 18px;
+        }
+
+        .options button {
+            width: 100%;
+            text-align: left;
+            background: #e3ebf6;
+            border: none;
+            border-radius: 10px;
+            padding: 16px 24px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        .options button:hover {
+            background: #c7d7ea;
+            transform: scale(1.01);
+        }
+
+        .options button.correct {
+            background-color: #38a169 !important;
+            color: white;
+            font-weight: bold;
+        }
+
+        .options button.incorrect {
+            background-color: #e53e3e !important;
+            color: white;
+            font-weight: bold;
+        }
+
+        .result {
+            margin-top: 30px;
+            font-weight: bold;
+            font-size: 20px;
+            text-align: center;
+        }
+
+        .result.correct {
+            color: green;
+        }
+
+        .result.incorrect {
+            color: red;
+        }
+
+        #nextBtn {
+            margin-top: 35px;
+            background: #2b6cb0;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: none;
+            float: right;
+        }
+
+        #nextBtn:hover {
+            background: #2c5282;
+        }
+
+        #scoreBox {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: #2b6cb0;
+        }
+
+        footer {
+            margin-top: 60px;
+            text-align: center;
+            font-size: 15px;
+            color: #555;
+        }
+
+		.question-navigation {
+			position: fixed;
+			left: 0;
+			top: 0;
+			bottom: 0;
+			width: 140px; /* Genişliği küçülttük */
+			overflow-y: auto;
+			background: #e2e8f0;
+			padding: 20px;
+			box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+			z-index: 1;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: flex-start;
+		}
+
+		.question-navigation a,
+		.question-navigation h3 {
+			text-align: center; /* Link ve başlıkları ortalar */
+			width: 100%;
+		}
+
+		.question-navigation a {
+			text-decoration: none;
+			font-size: 18px;
+			margin-bottom: 20px;
+			color: white;  /* Yazı rengini beyaz yapalım */
+			background-color: #38a169;  /* Yeşil arka plan rengi */
+			padding: 10px 20px;  /* Düğmeye biraz iç boşluk ekleyelim */
+			border-radius: 8px;  /* Kenarlarını yuvarlayalım */
+			font-weight: bold;
+			display: block;  /* Linkin tüm alanını tıklanabilir yapar */
+			text-align: center;  /* Yazıyı ortalar */
+			transition: background-color 0.3s ease;  /* Hover efekti eklerken yumuşak geçiş sağlar */
+		}
+
+		.question-navigation h3 {
+			font-size: 18px;
+			margin-bottom: 10px;
+		}
+
+        .question-navigation a:hover {
+            background-color: #2f855a;
+        }
+
+        .question-list {
+            padding-left: 20px;
+            font-size: 14px;
+            line-height: 1.6;
+            list-style: none;
+        }
+
+        .question-list li {
+            background: white;
+            padding: 6px 10px;
+            border-radius: 6px;
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            margin-bottom: 6px;
+        }
+
+        .question-list li.active {
+            font-weight: bold;
+            color: #2b6cb0;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+                overflow-y: auto;
+                align-items: flex-start;
+                padding: 20px;
+            }
+
+            .quiz-container {
+                margin-left: 0 !important;
+                margin-top: 20px;
+                padding: 24px;
+                width: 100%;
+                max-width: 100%;
+            }
+
+			.question-navigation {
+				position: static;
+				width: 100%;  /* Mobil görünümde genişlik %100 olacak */
+				box-shadow: none;
+				margin-bottom: 20px;
+				padding: 10px;
+				margin-top: 10px;
+			}
+
+            .question-navigation a {
+                width: auto;
+                padding: 8px 16px;
+                font-size: 16px;
+            }
+
+            .question-list {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 6px;
+                padding-left: 0;
+                justify-content: center;
+            }
+
+            .question-list li {
+                flex: 0 0 auto;
+                font-size: 14px;
+                padding: 6px 10px;
+                border-radius: 6px;
+                box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+                cursor: pointer;
+            }
+
+            .question-list li.active {
+                font-weight: bold;
+                color: #2b6cb0;
+            }
+
+            .question {
+                font-size: 20px;
+            }
+
+            .options button {
+                font-size: 16px;
+                padding: 12px 18px;
+            }
+
+            #nextBtn {
+                float: none;
+                display: block;
+                margin: 30px auto 0 auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .question-navigation {
+                width: 100%;
+                padding: 8px;
+            }
+
+            .question-navigation a {
+                font-size: 14px;
+                padding: 8px 12px;
+            }
+
+            .options button {
+                font-size: 14px;
+                padding: 12px;
+            }
+
+            .question {
+                font-size: 18px;
+            }
+
+            #nextBtn {
+                padding: 12px 24px;
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="question-navigation">
+        <a href="index.html">Ana Sayfa</a>
+        <h3>Tüm Sorular</h3>
+        <ol id="questionList" class="question-list"></ol>
+    </div>
+
+    <div class="quiz-container">
+        <div id="quiz">
+            <div class="question" id="question"></div>
+            <ul class="options" id="options"></ul>
+            <button id="nextBtn" type="button">Sonraki Soru</button>
+            <div class="result" id="result"></div>
+            <div id="scoreBox"></div>
+        </div>
+        <footer>
+            Bu test <strong>Elektrik Kuvvetli Akım Tesisleri Yönetmeliği</strong> temel alınarak hazırlanmıştır.<br />
+            [ ramazan.bozkurt@tedas.gov.tr ]
+        </footer>
+    </div>
+
+    <script>
+        const harfler = ["A", "B", "C", "D"];
+        const questions = [
+		  {
+			question: "Elektrik Kuvvetli Akım Tesisleri Yönetmeliği'nin amacı aşağıdakilerden hangisidir?",
+			options: [
+			  "Elektrik tesislerinde enerji verimliliğini sağlamak",
+			  "Elektrik kuvvetli akım tesislerinin güvenli bir şekilde kurulması, işletilmesi ve bakımını sağlamak",
+			  "Elektrik iç tesislerinin standartlarını belirlemek",
+			  "Sadece yüksek gerilimli sistemlerin kurulmasını düzenlemek",
+			],
+			answer: 1
+		  },
+		  {
+			question: "Aşağıdakilerden hangisi bu Yönetmeliğin kapsamı dışındadır?",
+			options: [
+			  "Trafo merkezleri",
+			  "Maden işletmelerindeki elektrik tesisleri",
+			  "Dağıtım panoları",
+			  "Havai hatlar",
+			],
+			answer: 1
+		  },
+		  {
+			question: "Yönetmelikte hüküm bulunmayan konularda hangi standartlar öncelikle dikkate alınmalıdır?",
+			options: [
+			  "ISO, CE, DIN",
+			  "VDE, ANSI, BS",
+			  "EN, HD, IEC, VDE",
+			  "TS, ISO, ASTM",
+			],
+			answer: 2
+		  },
+		  {
+			question: "Yönetmeliğin kapsamına girip girmediği konusunda kararsızlık olursa hangi kurumun kararı geçerlidir?",
+			options: [
+			  "TSE",
+			  "TEDAŞ",
+			  "Enerji ve Tabii Kaynaklar Bakanlığı",
+			  "EPDK",
+			],
+			answer: 2
+		  },
+		  {
+			question: "EKAT Belgesi neyi ifade eder?",
+			options: [
+			  "Elektrik kayıp kaçak tespit belgesi",
+			  "Yüksek gerilim altında çalışabilmek için alınan izin belgesi",
+			  "Enerji kalite denetim belgesi",
+			  "Topraklama uygunluk belgesi",
+			],
+			answer: 1
+		  },
+		  {
+			question: "Kuvvetli akım tesislerinin gerilim altındaki bölümlerine dokunmayı önlemek için ne yapılmalıdır?",
+			options: [
+			  "Yüksek dirençli iletken kullanılmalıdır",
+			  "Topraklama artırılmalıdır",
+			  "Emniyet mesafeleri ve koruma önlemleri sağlanmalıdır",
+			  "İletkenler izole edilmelidir",
+			],
+			answer: 2
+		  },
+		  {
+			question: "Elektrik tesislerinin elektromanyetik alan etkileri hangi ölçütlere göre sınırlandırılmalıdır?",
+			options: [
+			  "TS 3033",
+			  "İlgili standartlarda belirtilen müsaade edilebilir sınırlar",
+			  "Yerel yönetmelik hükümleri",
+			  "EN 50160 standardı",
+			],
+			answer: 1
+		  },
+		  {
+			question: "Aynı teknik ve ekonomik uygunlukta birden fazla çözüm varsa tercih nasıl yapılmalıdır?",
+			options: [
+			  "En ucuz olan seçilir",
+			  "En hızlı uygulanan tercih edilir",
+			  "Doğaya en az zarar veren seçilir",
+			  "Yerel üretici tarafından sağlanan tercih edilir",
+			],
+			answer: 2
+		  },
+		  {
+			question: "Elektrik kuvvetli akım tesislerinin topraklamasında hangi yönetmelik esas alınır?",
+			options: [
+			  "Elektrik İç Tesisleri Yönetmeliği",
+			  "Elektrik Kuvvetli Akım Tesisleri Yönetmeliği",
+			  "Elektrik Tesislerinde Topraklamalar Yönetmeliği",
+			  "Yapı Denetim Yönetmeliği",
+			],
+			answer: 2
+		  },
+		  {
+			question: "İç aşırı gerilimlerde yıldız noktası nasıl topraklanabilir?",
+			options: [
+			  "Yalıtılmış olarak",
+			  "Söndürme bobini üzerinden",
+			  "Seri dirençle",
+			  "Sadece açık şebekelerde",
+			],
+			answer: 1
+		  },
+		  {
+			question: "Sigortalar hangi özellikte seçilmelidir?",
+			options: [
+			  "Akım taşıma kapasiteleri %50 düşük olmalıdır",
+			  "Kısa devre akımını kesemeyebilir",
+			  "Uygun kısa devre kesme kapasitesine sahip olmalıdır",
+			  "Uygulama alanı göz önüne alınmaz",
+			],
+			answer: 2
+		  },
+		  {
+			question: "Tel sarılarak köprülenmiş sigortalar için ne söylenebilir?",
+			options: [
+			  "Kullanılabilir",
+			  "Sadece geçici kullanım için uygundur",
+			  "Yönetmelikçe yasaktır",
+			  "Sadece alçak gerilimde uygundur",
+			],
+			answer: 2
+		  },
+		  {
+			question: "Ark ve kıvılcımlar hangi durumda tehlike oluşturmaz?",
+			options: [
+			  "Korumasız iletkenlerde",
+			  "TS, EN, HD standartlarına göre yapılan tip testleriyle doğrulanmış sistemlerde",
+			  "Topraklanmış bare sistemlerde",
+			  "Yalnızca kompakt trafo merkezlerinde",
+			],
+			answer: 1
+		  },
+		  {
+			question: "Kumanda kolları yerden ne yüksekte olmalıdır?",
+			options: [
+			  "10–50 cm",
+			  "En az 50 cm, en fazla 170 cm",
+			  "50–200 cm",
+			  "En az 1 m, en fazla 3 m",
+			],
+			answer: 1
+		  },
+		  {
+			question: "Gerilim altındaki bölümlere karşı hangi koruyucu unsur gereklidir?",
+			options: [
+			  "Tel kafes",
+			  "Koruyucu kutu",
+			  "Halatlı sistem",
+			  "Sesli uyarı cihazı",
+			],
+			answer: 1
+		  },
+		  {
+			question: "Elektrik tesislerinin düzenlenmesinde aşağıdakilerden hangisi temel ilkedir?",
+			options: [
+			  "Yalnızca iç tesisler açık düzenlenmelidir",
+			  "Bakım gerektirmeyen yapı esas alınır",
+			  "Tüm bölümler kısa sürede izlenebilir şekilde açık düzenlenmelidir",
+			  "Gizli tesisat esastır",
+			],
+			answer: 2
+		  },
+		  {
+			question: "Elektrik tesislerinde uyarı levhalarına ilişkin hangisi yanlıştır?",
+			options: [
+			  "Tesis bağlama şeması yer almalıdır",
+			  "İlk yardım yönergeleri bulunmalıdır",
+			  "Levhalar silinebilir malzemeden yapılmalıdır",
+			  "Özel işletme talimatları asılmalıdır",
+			],
+			answer: 2
+		  },
+		  {
+			question: "Transformatör odasındaki sıcaklık, cebri havalandırma durumunda en fazla kaç °C olmalıdır?",
+			options: [
+			  "35°C",
+			  "45°C",
+			  "40°C",
+			  "30°C",
+			],
+			answer: 2
+		  },
+		  {
+			question: "Transformatörlerin duvarlara uzaklığı en az kaç cm olmalıdır?",
+			options: [
+			  "10 cm",
+			  "30 cm",
+			  "50 cm",
+			  "60 cm",
+			],
+			answer: 3
+		  },
+		  {
+			question: "Yağ hacmi 1500 litreden fazla olan transformatörler için aşağıdakilerden hangisi zorunludur?",
+			options: [
+			  "Yağ toplama işlemi gerekli değildir",
+			  "Sadece eşiği yüksek zemin yeterlidir",
+			  "Sızdırmaz betonarme yağ çukuru yapılmalıdır",
+			  "Yağ havuzunun üstü kapatılmamalıdır",
+			],
+			answer: 2
+		  },
+		  {
+			question: "Kurşun-asitli akülerin yerine hangi tip akülerin kullanılması zorunludur?",
+			options: [
+			  "Jel tipi",
+			  "Bakım gerektirmeyen ya da kuru tip",
+			  "Kaliteli elektrolitli",
+			  "Damıtılmış su destekli",
+			],
+			answer: 1
+		  },
+		  {
+			question: "Kurşun-asitli akü odalarının nem ve sıcaklık açısından nasıl olması gerekir?",
+			options: [
+			  "Kuru, serin ve sarsıntısız",
+			  "Islak, sıcak ve havalandırmasız",
+			  "Doğal ışıklı ve sıcak",
+			  "Maden tipi havalandırmalı",
+			],
+			answer: 0
+		  },
+		  {
+			question: "Akü bağlantılarında hangi güvenlik önlemi alınmalıdır?",
+			options: [
+			  "Yalnızca bir kutupta kesilmelidir",
+			  "Her iki kutuptan gerilim kesilerek ayrılmalıdır",
+			  "Kablo uçları açık bırakılmalıdır",
+			  "Sigorta ile bağlantı kesilmelidir",
+			],
+			answer: 1
+		  },
+		  {
+			question: "Yönetmelik değişikliği uyarınca yeni yapılacak yüksek gerilim tesislerinde geçiş süresi kaç yıldır?",
+			options: [
+			  "1 yıl",
+			  "1,5 yıl",
+			  "2 yıl",
+			  "Süresiz",
+			],
+			answer: 2
+		  },
+		  {
+			question: "İşletme ve bakım aygıtları ne sıklıkla denetlenmelidir?",
+			options: [
+			  "Yılda bir",
+			  "6 ayda bir",
+			  "İmalatçının öngördüğü sürelerde veya standartta belirtilen aralıklarla",
+			  "2 yılda bir",
+			],
+			answer: 2
+		  },
+		  {
+			question: "Tesislerin bakım ve onarımları neye göre yapılır?",
+			options: [
+			  "Yerel belediyenin yönergelerine göre",
+			  "Kullanıcının inisiyatifine göre",
+			  "Teknik belgelerde belirtilen sürelerde",
+			  "Arıza sonrası",
+			],
+			answer: 2
+		  },
+		  {
+			question: "Alçak gerilim kaç volta kadar olan gerilimleri kapsar?",
+			options: [
+			  "250 V",
+			  "500 V",
+			  "750 V",
+			  "1000 V",
+			],
+			answer: 3
+		  },
+		  {
+			question: "Tehlikeli gerilim alçak gerilimde kaç volttan büyüktür?",
+			options: [
+			  "24 V",
+			  "30 V",
+			  "50 V",
+			  "100 V",
+			],
+			answer: 2
+		  },
+		  {
+			question: "Aşağıdakilerden hangisi bir işletme elemanı değildir?",
+			options: [
+			  "Motor",
+			  "Ayırıcı",
+			  "Kondansatör",
+			  "Kesici",
+			],
+			answer: 2
+		  },
+		  {
+			question: "İletim şebekesi tanımına göre hangi görev üstlenir?",
+			options: [
+			  "Enerji üretir",
+			  "Enerjiyi tüketiciye doğrudan verir",
+			  "Enerjiyi santralden tüketiciye taşır",
+			  "Enerjiyi uzak mesafelere iletir",
+			],
+			answer: 3
+		  },
+		  {
+			question: "Yüksek gerilim için eşik değeri nedir?",
+			options: [
+			  "500 V",
+			  "750 V",
+			  "1000 V",
+			  "1500 V",
+			],
+			answer: 2
+		  },
+		  {
+			question: "Dağıtım transformatör merkezi ne iş yapar?",
+			options: [
+			  "Enerjiyi depolar",
+			  "Yüksek gerilimden alçak gerilime dönüştürür",
+			  "Enerjiyi sabitler",
+			  "Enerjiyi frekansla dengeler",
+			],
+			answer: 1
+		  },
+		  {
+			question: "Ağ (Enterkonnekte) şebeke nedir?",
+			options: [
+			  "Tek yönlü enerji dağıtım ağı",
+			  "Santrallerin bağlı olduğu gözlü yapı",
+			  "Şehir içi şebeke",
+			  "Sadece rüzgar türbinlerini kapsar",
+			],
+			answer: 1
+		  },
+		  {
+			question: "Aşırı gerilim tanımına göre hangi ifade doğrudur?",
+			options: [
+			  "İşletme frekansında oluşur",
+			  "Sürekli gerilim değerinin altındadır",
+			  "Kısa süreli ve frekans dışı bir yükselmedir",
+			  "Toprak hattında oluşmaz",
+			],
+			answer: 2
+		  },
+		  {
+			question: "Hava hattı nedir?",
+			options: [
+			  "Yer altı iletken sistemi",
+			  "Sadece alçak gerilimli hat",
+			  "Yer üstünde direk ve izolatörlerle desteklenen enerji iletim sistemi",
+			  "Kablo şebekesinin tamamlayıcısı",
+			],
+			answer: 2
+		  },
+		  {
+			question: "Gerçek kesit nedir?",
+			options: [
+			  "Örgülü iletkenin net kesiti",
+			  "İletkenin görünür kesiti",
+			  "Nominal kesitten %10 büyük olan",
+			  "Çekme kuvvetine göre hesaplanan",
+			],
+			answer: 0
+		  },
+		  {
+			question: "Kuvvetli akım tesisleri hangi koşullarda “tehlikesiz” sayılır?",
+			options: [
+			  "İşletme personeli için izoleli olduğunda",
+			  "Tesis aktif bölümlerine rastgele dokunmak mümkün olmadığında ve güvenlik önlemleri alındığında",
+			  "Sadece topraklaması varsa",
+			  "Yılda bir kontrol edildiğinde",
+			],
+			answer: 1
+		  },
+		  {
+			question: "Elektrik tesislerinde koruma önlemleri hangi gerilim seviyeleri dikkate alınarak uygulanmalıdır?",
+			options: [
+			  "Sadece yüksek gerilimler",
+			  "Sadece alçak gerilimler",
+			  "İşletme gerilimi dikkate alınmalıdır",
+			  "Nominal gerilim değeri",
+			],
+			answer: 2
+		  },
+		  {
+			question: "Elektromanyetik alanlar için sınır değerler neye göre belirlenir?",
+			options: [
+			  "TS EN 50160’a göre",
+			  "Yerel elektrik dairesine göre",
+			  "İlgili ulusal veya uluslararası standartlardaki değerlere göre",
+			  "Kullanıcının ihtiyacına göre",
+			],
+			answer: 2
+		  },
+		  {
+			question: "Elektrik tesislerinde harmoniklerin ne yapılması beklenir?",
+			options: [
+			  "Göz ardı edilir",
+			  "Şebekeye yayılması önlenmelidir",
+			  "Topraklama üzerinden atılır",
+			  "Sadece üretim tesislerinde engellenir",
+			],
+			answer: 1
+		  },
+		  {
+			question: "Aşağıdakilerden hangisi “doğaya zarar vermeyen çözüm” seçimini etkiler?",
+			options: [
+			  "En ucuz seçenek olması",
+			  "Teknik eşdeğerlilik bulunması durumunda seçilmesi",
+			  "Her zaman doğaya en az zarar vereni seçmek zorunludur",
+			  "Bakanlıkça onaylı olması",
+			],
+			answer: 1
+		  },
+		  {
+			question: "Elektrik tesislerinde elektromanyetik etkileşime karşı alınacak önlemler neye göre belirlenmelidir?",
+			options: [
+			  "Sadece topraklama sistemine göre",
+			  "Görsel denetimlere göre",
+			  "Yönetmelikte belirtilen sınır değerler ve teknik ölçümler dikkate alınarak",
+			  "İletken cinsine göre",
+			],
+			answer: 2
+		  },
+		  {
+			question: "İşletme durumunda bile emniyetsiz olabilecek tesisler için ne yapılmalıdır?",
+			options: [
+			  "Şebekeden ayrılmalıdır",
+			  "Derhal sökülmelidir",
+			  "Güvenlik önlemleri artırılmalı ve yeniden değerlendirme yapılmalıdır",
+			  "Rapor tutulup kayıt alınması yeterlidir",
+			],
+			answer: 2
+		  },
+		  {
+			question: "Birden fazla teknik çözüm olması durumunda doğaya en az zarar verenin tercih edilmesi zorunluluğu aşağıdakilerden hangisidir?",
+			options: [
+			  "Yönetmelik eki",
+			  "Enerji Verimliliği Tebliği",
+			  "Genel hükümler bölümü",
+			  "Kurulum prosedürü",
+			],
+			answer: 2
+		  },
+		  {
+			question: "Elektrik tesislerinin elektromanyetik etkisi en çok hangi durumu olumsuz etkiler?",
+			options: [
+			  "Dağıtım panoları",
+			  "Kompanzasyon sistemleri",
+			  "Elektromanyetik alanlara duyarlı tesisler",
+			  "Aydınlatma direkleri",
+			],
+			answer: 2
+		  },
+		  {
+			question: "İşletme güvenliği açısından işletme personelinin aktif bölümlere rastgele temas etmemesi için ne tür önlemler alınmalıdır?",
+			options: [
+			  "Tüm tesisin topraklanması yeterlidir",
+			  "Ekipmanın dışına uyarı levhası asılmalıdır",
+			  "Koruyucu kaplamalar, mesafe, izolasyon ve benzeri güvenlik tedbirleri alınmalıdır",
+			  "Sadece yüksek gerilim bölümleri korunmalıdır",
+			],
+			answer: 2
+		  },
+		  {
+			question: "Topraklama işlemi aşağıdaki yönetmeliklerden hangisine göre yapılmalıdır?",
+			options: [
+			  "Yapı Malzemeleri Yönetmeliği",
+			  "Elektrik İç Tesisleri Yönetmeliği",
+			  "Elektrik Tesislerinde Topraklamalar Yönetmeliği",
+			  "TS EN 61439",
+			],
+			answer: 2
+		  },
+		  {
+			question: "Endirekt temasa karşı korumada esas alınan yönetmelik aşağıdakilerden hangisidir?",
+			options: [
+			  "Elektrik Tesislerinde Topraklamalar Yönetmeliği",
+			  "Elektrik İç Tesisleri Yönetmeliği",
+			  "Elektrik Kuvvetli Akım Tesisleri Yönetmeliği",
+			  "TS EN 50160",
+			],
+			answer: 1
+		  },
+		  {
+			question: "İç aşırı gerilimlere karşı koruma yöntemlerinden biri aşağıdakilerden hangisidir?",
+			options: [
+			  "Nominal gerilim artırımı",
+			  "Trafo bağlantısı zayıflatılması",
+			  "Yıldız noktası topraklaması",
+			  "Sigortanın atlatılması",
+			],
+			answer: 2
+		  },
+		  {
+			question: "Gerilim yükselmelerine karşı hangi önlem gereklidir?",
+			options: [
+			  "Sigortasız hat düzeni",
+			  "Topraklama sisteminden ayrılma",
+			  "Düşük empedanslı topraklama sistemleri",
+			  "İkincil izolasyon",
+			],
+			answer: 2
+		  },
+		  {
+			question: "Aşağıdakilerden hangisi sigortalarla ilgili doğru bir ifadedir?",
+			options: [
+			  "Tesisin kısa devre akımını kesebilecek kapasitede olmalıdır",
+			  "Yüksek empedansla çalışmalıdır",
+			  "Nominal akımdan bağımsız seçilir",
+			  "Sadece plastik kaplı olmalıdır",
+			],
+			answer: 0
+		  },
+		  {
+			question: "Tel sarılarak köprülenen sigortalar için aşağıdakilerden hangisi doğrudur?",
+			options: [
+			  "Belirli durumlarda kullanılabilir",
+			  "Yalnızca geçici hatlarda kullanılır",
+			  "Yönetmelik tarafından açıkça yasaklanmıştır",
+			  "Topraklı sistemlerde zorunludur",
+			],
+			answer: 2
+		  },
+		  {
+			question: "Sigortalar neden yeterli kısa devre kesme kapasitesine sahip olmalıdır?",
+			options: [
+			  "Aşırı gerilimleri düşürmek için",
+			  "Aygıtları topraklama gereksiniminden kurtarmak için",
+			  "Kısa devre akımını güvenli şekilde kesebilmek için",
+			  "Enerji kaybını azaltmak için",
+			],
+			answer: 2
+		  },
+		  {
+			question: "Aşırı akım koruma düzeni nasıl konumlandırılmalıdır?",
+			options: [
+			  "Topraklama hattını devre dışı bırakacak şekilde",
+			  "Tehlikede olan tüm iletkenleri kesecek biçimde",
+			  "Nötr hattına seri bağlanarak",
+			  "Dağıtım panosunun dışında",
+			],
+			answer: 1
+		  },
+		  {
+			question: "Koruma düzenleri hangi durumda etkinliğini kaybeder?",
+			options: [
+			  "Sistemin empedansı arttığında",
+			  "Topraklama sistemi sistemden ayrıldığında",
+			  "Kablolar PVC olduğunda",
+			  "Sisteme kesici eklendiğinde",
+			],
+			answer: 1
+		  },
+		  {
+			question: "Aşağıdakilerden hangisi topraklamaya yönelik olarak doğru değildir?",
+			options: [
+			  "İlgili yönetmeliğe uygun yapılmalıdır",
+			  "Her işletme durumunda geçerli olmalıdır",
+			  "Yalnızca normal çalışma sırasında geçerlidir",
+			  "İnsanları tehlikeye atmamalıdır",
+			],
+			answer: 2
+		  },
+		  {
+			question: "Kuvvetli akım aygıtları neye göre seçilmeli ve düzenlenmelidir?",
+			options: [
+			  "Görsel uyum esas alınarak",
+			  "Düşük maliyetli olan tercih edilerek",
+			  "İşletme koşullarına ve tehlikelere karşı koruyacak şekilde",
+			  "İmalatçı tavsiyesine göre",
+			],
+			answer: 2
+		  },
+		  {
+			question: "Aygıtların dış gövdelerinde hangi özellik aranmaz?",
+			options: [
+			  "Silinmez ve bozulmaz bilgi etiketi",
+			  "Görsel olarak hoş tasarım",
+			  "Tip numarası ve üretici bilgisi",
+			  "İmalat yılı ve nominal değerler",
+			],
+			answer: 1
+		  },
+		  {
+			question: "Koruyucu kutular için hangi durum doğrudur?",
+			options: [
+			  "Sadece iç mekânda kullanılır",
+			  "Ark oluşsa bile güvenli çalışmayı sağlamalıdır",
+			  "Uyarı etiketi içermesi zorunlu değildir",
+			  "10 yıl sonra değiştirilmelidir",
+			],
+			answer: 1
+		  },
+		  {
+			question: "Kesici ve ayırıcıların açık/kapalı konumu nasıl belirlenmelidir?",
+			options: [
+			  "Renkli lambalarla",
+			  "Görevli personelin beyanıyla",
+			  "Yerleştirilecek emniyetli düzenle gösterilmelidir",
+			  "Devre kesildiğinde anlaşılır",
+			],
+			answer: 2
+		  },
+		  {
+			question: "Yardımcı akım devrelerinde sigorta kullanımı hangi durumda mümkündür?",
+			options: [
+			  "Sadece dış hava koşullarında",
+			  "Teknik zorunluluk varsa",
+			  "Her zaman tercih edilir",
+			  "Mevzuat izin vermiyorsa",
+			],
+			answer: 1
+		  },
+		  {
+			question: "Yardımcı devrede sigorta kullanılıyorsa devre hangi özelliğe sahip olmalıdır?",
+			options: [
+			  "Sigorta olmadan da çalışmalıdır",
+			  "Yardımcı devre sigortaya göre boyutlandırılmalıdır",
+			  "Sigorta akımının birkaç katını taşıyabilmelidir",
+			  "Sadece nötr hattına uygulanmalıdır",
+			],
+			answer: 2
+		  },
+		  {
+			question: "Sigortalı ayırıcı bulunan direk altına hangi önlem alınmalıdır?",
+			options: [
+			  "Toprak zemin döşenmelidir",
+			  "Yanmaz örtü serilmelidir",
+			  "10 cm kalınlıkta mıcır veya grobeton uygulanmalıdır",
+			  "Kauçuk zemin yerleştirilmelidir",
+			],
+			answer: 2
+		  },
+		  {
+			question: "Aygıtların ısınması hangi koşulla sınırlanmalıdır?",
+			options: [
+			  "İmalatçının önerdiği değere göre",
+			  "TS EN standardına göre belirlenen sıcaklık artışıyla",
+			  "Personelin hissettiği sıcaklıkla",
+			  "Elektriksel yalıtım malzemesinin cinsine göre",
+			],
+			answer: 1
+		  },
+		  {
+			question: "Yük altında çalışan aygıtlarda hangi özellik aranmalıdır?",
+			options: [
+			  "Parlak etiketli olmalıdır",
+			  "Temas eden parçalar dışta olmalıdır",
+			  "Ark oluşmasına karşı güvenlik sağlanmalıdır",
+			  "Islak ortamda çalışmalıdır",
+			],
+			answer: 2
+		  },
+		  {
+			question: "Kuvvetli akım aygıtlarının dış ortamda kullanılabilmesi için hangi özelliğe sahip olması gerekir?",
+			options: [
+			  "Sadece renklendirilmiş olması",
+			  "İç ortam tipinde tasarlanmış olması",
+			  "Uygun koruma derecesine sahip olması",
+			  "İsteğe bağlı havalandırma bulunması",
+			],
+			answer: 2
+		  },
+		  {
+			question: "Elektrik tesisleri aşağıdakilerden hangisine uygun olacak şekilde düzenlenmelidir?",
+			options: [
+			  "Gizli ve korunaklı",
+			  "Kolay izlenebilir, onarılabilir ve bakım yapılabilir",
+			  "Yüksek frekanslı iletkenlerle uyumlu",
+			  "Yalnızca yeraltı hatlarıyla",
+			],
+			answer: 1
+		  },
+		  {
+			question: "Aynı tesiste farklı gerilim ve akım türleri varsa ne yapılmalıdır?",
+			options: [
+			  "Bir arada kullanılmalıdır",
+			  "Topraklaması ortak yapılmalıdır",
+			  "Ayrı gruplar halinde toplanıp birbirinden ayrılmalıdır",
+			  "Etiketleme yapılmalıdır",
+			],
+			answer: 2
+		  },
+		  {
+			question: "Trafo merkezlerinde makine işleviyle ilgili açıklamalar nerede bulunmalıdır?",
+			options: [
+			  "Kontrol odasında",
+			  "Giriş panosunda",
+			  "Uygun bir levha üzerinde tesisin uygun bir yerinde",
+			  "İşletme binasında dosya olarak",
+			],
+			answer: 2
+		  },
+		  {
+			question: "Tesislerde yanabilen malzemeler nasıl kullanılabilir?",
+			options: [
+			  "Kullanımı tamamen yasaktır",
+			  "Yanmayan örtü ile kaplanarak veya özel yangın önlemleri alınarak",
+			  "Koruma kutusu içinde",
+			  "Sadece duvarlarda kullanılabilir",
+			],
+			answer: 1
+		  },
+		  {
+			question: "Acil durum aydınlatmaları nerelerde bulunmalıdır?",
+			options: [
+			  "Yalnızca jeneratör odalarında",
+			  "Zorunlu değildir",
+			  "Gerekli yerlerde, özellikle güvenli tahliyeye olanak sağlayacak bölgelerde",
+			  "Her yerde",
+			],
+			answer: 2
+		  },
+		  {
+			question: "Tesislerde yangın tehlikesine karşı aşağıdaki uygulamalardan hangisi yanlıştır?",
+			options: [
+			  "Yangın dedektörleri konulması",
+			  "Patlamaya karşı havalandırma sağlanması",
+			  "Yanıcı malzemelerin doğrudan iletkenle temas ettirilmesi",
+			  "Otomatik yangın söndürme sistemleri kurulması",
+			],
+			answer: 2
+		  },
+		  {
+			question: "Aşağıdakilerden hangisi bakım personelinin güvenliği için zorunlu değildir?",
+			options: [
+			  "Koruyucu donanım",
+			  "Acil durum planı",
+			  "Güvenli çalışma prosedürü",
+			  "Sigorta değerinin yükseltilmesi",
+			],
+			answer: 3
+		  },
+		  {
+			question: "Tesislerde kullanılan bakım ekipmanları hangi zaman aralığında kontrol edilmelidir?",
+			options: [
+			  "Kullanıcı takdirine göre",
+			  "Yıllık",
+			  "İmalatçı tavsiyesi ya da standartta belirtilen sürelerde",
+			  "6 ayda bir",
+			],
+			answer: 2
+		  },
+		  {
+			question: "Tesislerde bakım ve onarım çalışmaları hangi belgelere göre yapılmalıdır?",
+			options: [
+			  "Ustalık belgelerine",
+			  "Teknik dokümana ve kullanım kitapçıklarına",
+			  "Yerel belediye kurallarına",
+			  "Personelin deneyimine",
+			],
+			answer: 1
+		  },
+		  {
+			question: "Yeni yapılacak ve 36 kV’a kadar gerilimde çalışacak yüksek gerilim tesislerinde, geçiş süresi sonunda hangi sistem kullanılması zorunlu hale gelir?",
+			options: [
+			  "Sadece açık sistem ayırıcılar",
+			  "Kompakt transformatör merkezleri",
+			  "Metal mahfazalı, bölmeli, gaz yalıtımlı hücreler",
+			  "Yağlı tip kesiciler",
+			],
+			answer: 2
+		  },
+];
+
+        let currentQuestion = 0;
+        let score = 0;
+        const questionEl = document.getElementById("question");
+        const optionsEl = document.getElementById("options");
+        const resultEl = document.getElementById("result");
+        const nextBtn = document.getElementById("nextBtn");
+        const scoreBox = document.getElementById("scoreBox");
+
+        function loadQuestion() {
+            const allNavItems = document.querySelectorAll('#questionList li');
+            allNavItems.forEach((item, idx) => {
+                item.classList.remove('active');
+                if (idx === currentQuestion) {
+                    item.classList.add('active');
+                }
+            });
+
+            const questionList = document.getElementById("questionList");
+            if (questionList && questionList.children.length === 0) {
+                questions.forEach((q, i) => {
+                    const li = document.createElement("li");
+                    li.textContent = `Soru ${i + 1}`;
+                    li.onclick = () => {
+                        currentQuestion = i;
+                        loadQuestion();
+                    };
+                    questionList.appendChild(li);
+                });
+            }
+
+            const q = questions[currentQuestion];
+            questionEl.textContent = `Soru ${currentQuestion + 1}: ${q.question}`;
+            optionsEl.innerHTML = "";
+            resultEl.textContent = "";
+            nextBtn.style.display = "none";
+            scoreBox.textContent = `Puan: ${score} / ${questions.length}`;
+
+            q.options.forEach((opt, index) => {
+                const li = document.createElement("li");
+                const btn = document.createElement("button");
+                btn.textContent = `${harfler[index]}) ${opt}`;
+                btn.onclick = () => checkAnswer(index, btn);
+                li.appendChild(btn);
+                optionsEl.appendChild(li);
+            });
+        }
+
+        function checkAnswer(selected, btnClicked) {
+            const q = questions[currentQuestion];
+            const buttons = document.querySelectorAll(".options button");
+
+            buttons.forEach((btn, idx) => {
+                btn.disabled = true;
+                btn.classList.remove("correct", "incorrect");
+                if (idx === q.answer) {
+                    btn.classList.add("correct");
+                }
+            });
+
+            if (selected === q.answer) {
+                score++;
+                resultEl.textContent = "Doğru cevap!";
+                resultEl.className = "result correct";
+            } else {
+                resultEl.textContent = "Yanlış cevap.";
+                resultEl.className = "result incorrect";
+                btnClicked.classList.add("incorrect");
+            }
+
+            nextBtn.style.display = "inline-block";
+            scoreBox.textContent = `Puan: ${score} / ${questions.length}`;
+        }
+
+        nextBtn.onclick = () => {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+            } else {
+                questionEl.textContent = "Test tamamlandı!";
+                optionsEl.innerHTML = "";
+                nextBtn.style.display = "none";
+                resultEl.textContent = `Tebrikler! ${score} / ${questions.length} doğru cevap verdiniz.`;
+                resultEl.className = "result correct";
+            }
+        };
+
+        loadQuestion();
+    </script>
+</body>
+
+</html>

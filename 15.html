@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>rA | TEDAŞ Genel Müdürlüğü Elektrik Dağıtım Tesisleri Kabul Süreçlerine İlişkin Usul ve Esaslar Testi</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(120deg, #f0f4f8, #d9e2ec);
+            margin: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-bottom: 20px;
+        }
+
+		.quiz-container {
+			background: #ffffff;
+			padding: 50px;
+			border-radius: 24px;
+			box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+			max-width: 100%;
+			width: 70%;  /* PC'de genişliği %70 yapıyoruz */
+			box-sizing: border-box;
+			margin: 20px;
+			margin-left: 20%;  /* Sol taraftan %10 boşluk bırakarak sağa kaydırıyoruz */
+		}
+
+        .question {
+            font-size: 24px;
+            margin-bottom: 30px;
+            font-weight: 600;
+            color: #102a43;
+            text-align: center;
+        }
+
+        .options {
+            list-style: none;
+            padding: 0;
+        }
+
+        .options li {
+            margin-bottom: 18px;
+        }
+
+        .options button {
+            width: 100%;
+            text-align: left;
+            background: #e3ebf6;
+            border: none;
+            border-radius: 10px;
+            padding: 16px 24px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        .options button:hover {
+            background: #c7d7ea;
+            transform: scale(1.01);
+        }
+
+        .options button.correct {
+            background-color: #38a169 !important;
+            color: white;
+            font-weight: bold;
+        }
+
+        .options button.incorrect {
+            background-color: #e53e3e !important;
+            color: white;
+            font-weight: bold;
+        }
+
+        .result {
+            margin-top: 30px;
+            font-weight: bold;
+            font-size: 20px;
+            text-align: center;
+        }
+
+        .result.correct {
+            color: green;
+        }
+
+        .result.incorrect {
+            color: red;
+        }
+
+        #nextBtn {
+            margin-top: 35px;
+            background: #2b6cb0;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: none;
+            float: right;
+        }
+
+        #nextBtn:hover {
+            background: #2c5282;
+        }
+
+        #scoreBox {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: #2b6cb0;
+        }
+
+        footer {
+            margin-top: 60px;
+            text-align: center;
+            font-size: 15px;
+            color: #555;
+        }
+
+		.question-navigation {
+			position: fixed;
+			left: 0;
+			top: 0;
+			bottom: 0;
+			width: 140px; /* Genişliği küçülttük */
+			overflow-y: auto;
+			background: #e2e8f0;
+			padding: 20px;
+			box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+			z-index: 1;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: flex-start;
+		}
+
+		.question-navigation a,
+		.question-navigation h3 {
+			text-align: center; /* Link ve başlıkları ortalar */
+			width: 100%;
+		}
+
+		.question-navigation a {
+			text-decoration: none;
+			font-size: 18px;
+			margin-bottom: 20px;
+			color: white;  /* Yazı rengini beyaz yapalım */
+			background-color: #38a169;  /* Yeşil arka plan rengi */
+			padding: 10px 20px;  /* Düğmeye biraz iç boşluk ekleyelim */
+			border-radius: 8px;  /* Kenarlarını yuvarlayalım */
+			font-weight: bold;
+			display: block;  /* Linkin tüm alanını tıklanabilir yapar */
+			text-align: center;  /* Yazıyı ortalar */
+			transition: background-color 0.3s ease;  /* Hover efekti eklerken yumuşak geçiş sağlar */
+		}
+
+		.question-navigation h3 {
+			font-size: 18px;
+			margin-bottom: 10px;
+		}
+
+        .question-navigation a:hover {
+            background-color: #2f855a;
+        }
+
+        .question-list {
+            padding-left: 20px;
+            font-size: 14px;
+            line-height: 1.6;
+            list-style: none;
+        }
+
+        .question-list li {
+            background: white;
+            padding: 6px 10px;
+            border-radius: 6px;
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            margin-bottom: 6px;
+        }
+
+        .question-list li.active {
+            font-weight: bold;
+            color: #2b6cb0;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+                overflow-y: auto;
+                align-items: flex-start;
+                padding: 20px;
+            }
+
+            .quiz-container {
+                margin-left: 0 !important;
+                margin-top: 20px;
+                padding: 24px;
+                width: 100%;
+                max-width: 100%;
+            }
+
+			.question-navigation {
+				position: static;
+				width: 100%;  /* Mobil görünümde genişlik %100 olacak */
+				box-shadow: none;
+				margin-bottom: 20px;
+				padding: 10px;
+				margin-top: 10px;
+			}
+
+            .question-navigation a {
+                width: auto;
+                padding: 8px 16px;
+                font-size: 16px;
+            }
+
+            .question-list {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 6px;
+                padding-left: 0;
+                justify-content: center;
+            }
+
+            .question-list li {
+                flex: 0 0 auto;
+                font-size: 14px;
+                padding: 6px 10px;
+                border-radius: 6px;
+                box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+                cursor: pointer;
+            }
+
+            .question-list li.active {
+                font-weight: bold;
+                color: #2b6cb0;
+            }
+
+            .question {
+                font-size: 20px;
+            }
+
+            .options button {
+                font-size: 16px;
+                padding: 12px 18px;
+            }
+
+            #nextBtn {
+                float: none;
+                display: block;
+                margin: 30px auto 0 auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .question-navigation {
+                width: 100%;
+                padding: 8px;
+            }
+
+            .question-navigation a {
+                font-size: 14px;
+                padding: 8px 12px;
+            }
+
+            .options button {
+                font-size: 14px;
+                padding: 12px;
+            }
+
+            .question {
+                font-size: 18px;
+            }
+
+            #nextBtn {
+                padding: 12px 24px;
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="question-navigation">
+        <a href="index.html">Ana Sayfa</a>
+        <h3>Tüm Sorular</h3>
+        <ol id="questionList" class="question-list"></ol>
+    </div>
+
+    <div class="quiz-container">
+        <div id="quiz">
+            <div class="question" id="question"></div>
+            <ul class="options" id="options"></ul>
+            <button id="nextBtn" type="button">Sonraki Soru</button>
+            <div class="result" id="result"></div>
+            <div id="scoreBox"></div>
+        </div>
+        <footer>
+            Bu test <strong>TEDAŞ Genel Müdürlüğü Elektrik Dağıtım Tesisleri Kabul Süreçlerine İlişkin Usul ve Esaslar</strong> temel alınarak hazırlanmıştır.<br />
+            [ ramazan.bozkurt@tedas.gov.tr ]
+        </footer>
+    </div>
+
+    <script>
+        const harfler = ["A", "B", "C", "D"];
+		const questions = [
+		  { question: "Elektrik Dağıtım Tesisleri Kabul Usul ve Esaslarının amacı nedir?", options: ["TEDAŞ'ın finansal faaliyetlerini düzenlemek", "Elektrik enerjisi üretimini denetlemek", "Elektrik dağıtım tesisleri yatırımlarının kabulüne ilişkin usul ve esasları belirlemek", "Elektrik tüketim raporlarını oluşturmak"], answer: 2 },
+		  { question: "Elektrik Dağıtım Tesisleri Kabul Usul ve Esasları hangi yönetmeliğe dayanılarak hazırlanmıştır?", options: ["Elektrik Piyasası Lisans Yönetmeliği", "Elektrik Tesisleri Kabul Yönetmeliği", "Yenilenebilir Enerji Kaynakları Yönetmeliği", "Elektrik Dağıtım Sistemi Yönetmeliği"], answer: 1 },
+		  { question: "Kabul heyeti hangi durumda oluşturulmaz?", options: ["Tüm belgelerin tam olarak sunulması halinde", "Geçici kabul hizmet satış bedelinin ödenmemesi durumunda", "Kabul başvurusunun zamanında yapılması durumunda", "Eksik belge olmaması durumunda"], answer: 1 },
+		  { question: "Geçici kabul tutanağında belirtilen eksiklikler en fazla kaç yıl içinde kesin kabul ile tamamlanmalıdır?", options: ["1 yıl", "2 yıl", "3 yıl", "5 yıl"], answer: 2 },
+		  { question: "Kabul heyetinin oluşturulması için hangi şart gereklidir?", options: ["Tesisin enerji vermeye başlaması", "Geçici kabul tutanağının imzalanması", "Kabul hizmet satış bedelinin ödenmesi", "Kurum içi onay yazısının alınması"], answer: 2 },
+		  { question: "Geçici kabul dosyasında yer alması gereken belgeler arasında aşağıdakilerden hangisi yoktur?", options: ["Topraklama Direnci Ölçüm Raporu", "KEP adresi bilgileri", "Yüklenici ile alıcı arasında düzenlenen fatura", "Proje onay yazısı"], answer: 2 },
+		  { question: "Kesin kabul işlemleri yapılabilmesi için geçici kabul tarihinden itibaren en az ne kadar süre geçmiş olmalıdır?", options: ["3 ay", "6 ay", "1 yıl", "3 yıl"], answer: 2 },
+		  { question: "Aşağıdakilerden hangisi kabul heyetinde görev alamaz?", options: ["Tesisin projesini onaylayan mühendis", "Yüklenici temsilcisi", "TEDAŞ personeli branş mühendisi", "Dağıtım lisansı sahibi şirket mühendisi"], answer: 0 },
+		  { question: "Kabul heyeti tarafından yapılan saha kontrollerinde eksik işlerin tespiti durumunda hangi işlem yapılır?", options: ["Tesis derhal reddedilir", "Kabul işlemi tamamlanır", "Kabule ara verilebilir", "Yüklenici değişir"], answer: 2 },
+		  { question: "Kabule verilen araya rağmen eksik işlerin ihale bedelinin % kaçını geçmesi durumunda kabul yapılmaz?", options: ["2", "3", "5", "10"], answer: 2 },
+		  { question: "Kısmi geçici kabul yapılabilmesi için proje kapsamında hangi şart aranmaz?", options: ["Tesisin tamamının bitirilmiş olması", "Müstakil kullanıma uygunluk", "İşletmeye açılma zorunluluğu", "Onaylı projede bölüm belirtimi"], answer: 0 },
+		  { question: "Geçici kabulden sonra tesisin yerinde bulunmaması durumunda ne yapılır?", options: ["Yeni başvuru alınır", "Kabul yapılır", "Kabul işlemi yapılmaz", "Yer tespiti yapılır"], answer: 2 },
+		  { question: "Tesisin teknik sorumlusunun kabulde bulunmaması durumunda ne olur?", options: ["Kabul heyeti oluşturulur", "Kabul işlemi yapılmaz", "İlgiliye yazı yazılır", "Kabul ertelenir"], answer: 1 },
+		  { question: "Ara verme işlemi sonrasında eksikliklerin giderilmediği tespit edilirse ne olur?", options: ["Kabul heyeti değiştirilir", "Yeni kabul başvurusu yapılır", "Kabul reddedilir", "İkinci ara verilir"], answer: 2 },
+		  { question: "Kabul heyeti tarafından yapılan ölçümler sonucu uygunluk yoksa hangi belge hazırlanır?", options: ["Ret tutanağı", "Tadilat projesi", "Enerji izni belgesi", "Fizibilite raporu"], answer: 0 },
+		  { question: "Kabul işlemlerinde kullanılan kablo kanallarının uygunluğu nasıl kontrol edilir?", options: ["Yalnızca belge ile", "Sondaj çukuru açılarak", "Gözle kontrol ile", "Yalnızca video ile"], answer: 1 },
+		  { question: "Kabulde kullanılan malzemelerin imal yılı ile tesis yılı arasındaki fark en fazla kaç yıl olabilir?", options: ["1", "2", "3", "4"], answer: 2 },
+		  { question: "Kabul tutanağının geçerlilik kazanması için hangi şart sağlanmalıdır?", options: ["TEDAŞ Genel Müdürü tarafından imzalanması", "POB tarafından onaylanması", "Yüklenici tarafından onaylanması", "Valilikçe uygun görülmesi"], answer: 1 },
+		  { question: "Kabul heyeti tutanaklarını kaç nüsha olarak düzenler?", options: ["3", "4", "5", "6"], answer: 2 },
+		  { question: "Kabulü yapılan tesiste etiketli malzemelerin bilgileri nereye yazılır?", options: ["Fotoğraf raporuna", "Tadilat raporuna", "Kabul tutanağına", "Enerji izin formuna"], answer: 2 },
+		  { question: "Kesin kabulde, geçici kabul sırasında belirtilen eksik ve hataların kontrolü hangi aşamada yapılır?", options: ["Tesis devreye alındıktan sonra", "İlk test öncesi", "Kesin kabul sırasında", "Kısmi kabulde"], answer: 2 },
+		  { question: "Geçici kabulden sonra yapılan değişikliklerin kesin kabulde geçerli sayılabilmesi için ne sunulmalıdır?", options: ["Yalnızca fatura", "Tadilat projesi ve geçici kabul tutanakları", "Saha kontrol raporu", "Sözlü beyan"], answer: 1 },
+		  { question: "Aşağıdakilerden hangisi kesin kabul yapılmasını engelleyen durumlar arasında değildir?", options: ["Eksik ve hatalı işlerin ihale bedelinin %5'ini geçmesi", "Tesisin tamamının yapılmamış olması", "Can ve mal emniyetinin sağlanmaması", "Enerji izni yazısının olmaması"], answer: 3 },
+		  { question: "Kabul işlemlerinde hangi durumlarda sondaj çukuru açılmaz?", options: ["Kabulde eksiklik yoksa", "Fotoğraf ve videolar eksiksiz ise", "Tesis yerinde değilse", "Topraklama yapılmamışsa"], answer: 1 },
+		  { question: "Kabul heyeti kaç iş günü içinde eksik belgeleri tamamlamak üzere başvuru sahibine süre tanır?", options: ["10", "12", "15", "20"], answer: 2 },
+		  { question: "Ret tutanağı düzenlendiğinde bu tutanak kime gönderilir?", options: ["Yükleniciye doğrudan", "İlgili il müdürlüğüne", "Kabul heyeti görevlendirmesi yapan birime", "Enerji Bakanlığına"], answer: 2 },
+		  { question: "Ara verme işlemi aynı tesis için en fazla kaç kez uygulanabilir?", options: ["1", "2", "3", "sınırsız"], answer: 1 },
+		  { question: "Kabul tutanaklarında yazı rengi ne olmalıdır?", options: ["Mavi", "Siyah", "Kırmızı", "Herhangi bir renk"], answer: 1 },
+		  { question: "Tutanaklarda yazım hatası olması durumunda ne yapılmalıdır?", options: ["Tutanak üzerinde çizilerek düzeltilir", "Yazı ile üstü kapatılır", "Yeni sayfa hazırlanarak imzalanır", "Üzerine etiket yapıştırılır"], answer: 2 },
+		  { question: "Kesin kabul süresi üretim tesisleri için en az kaç aydır?", options: ["3", "4", "5", "6"], answer: 3 },
+		  { question: "Geçici kabulde bulunacak elektrik mühendisine hangi belge verilir?", options: ["Enerji izin formu", "Yetkilendirme yazısı", "Oda kayıt belgesi", "Fotoğraf raporu"], answer: 1 },
+		  { question: "Kabul heyetinde yüklenicinin katılmaması durumunda ne olur?", options: ["Kabul ertelenir", "Kabul heyeti dağılır", "Kabul yapılır", "Yeni yüklenici atanır"], answer: 2 },
+		  { question: "Kabulde eksik işlerin düzeltilmesi için verilen süre sonunda işlem yapılmazsa ne olur?", options: ["Kabul tamamlanır", "Kabul ertelenir", "Kabul reddedilir", "Yeniden süre verilir"], answer: 2 },
+		  { question: "Kabul işlemleri sırasında kullanılan malzemelerin etiket bilgileri neyle karşılaştırılır?", options: ["Fatura", "Proje paftası", "Kurulan bilgiler", "Hiçbiri"], answer: 2 },
+		  { question: "Kabul sürecinde fotoğraf veya videoların yetersiz olması durumunda hangi işlem yapılır?", options: ["Rapor tutulur", "Yükleniciye ceza verilir", "Sondaj çukuru açılır", "Tesis kontrol edilir"], answer: 2 },
+		  { question: "Kabul tutanakları kaç iş günü içinde kontrol edilmelidir?", options: ["3", "4", "5", "7"], answer: 2 },
+		  { question: "Kabul heyeti tarafından düzenlenen tutanaklar kaç nüsha hazırlanır?", options: ["4", "5", "6", "7"], answer: 1 },
+		  { question: "Kabul heyetinde aynı mühendis geçici ve kesin kabulde başkan olabilir mi?", options: ["Evet", "Hayır", "Sadece onayla", "Sadece acil durumlarda"], answer: 1 },
+		  { question: "Kesin kabulde kullanılacak topraklama raporu en fazla kaç ay öncesine ait olabilir?", options: ["1 ay", "2 ay", "3 ay", "6 ay"], answer: 2 },
+		  { question: "Kesin kabul işlemleri hangi belgeye göre onaylanır?", options: ["Yüklenici raporu", "Geçici kabul tutanağı", "Saha kontrol çizelgesi", "Malzeme listesi"], answer: 1 },
+		  { question: "Elektrik tesislerinde kabul işlemleri hangi mevzuata uygun yapılır?", options: ["Enerji Piyasası Düzenleme Kurulu Kararı", "Elektrik Tesisleri Kabul Yönetmeliği", "Elektrik İç Tesisler Yönetmeliği", "OSOS Yönetmeliği"], answer: 1 },
+		  { question: "Kabul heyetinin toplanma tarihi kim tarafından belirlenir?", options: ["Dağıtım Şirketi Yetkilisi", "TEDAŞ Bölge Müdürü", "Kabul Heyeti Başkanı", "Yüklenici Firma"], answer: 2 },
+		  { question: "Kabul tutanaklarında yer alan 'Tesiste Görülen Özür ve Eksiklikler' sayfasında eksiklik yoksa ne yazılır?", options: ["Eksik yoktur", "Tesis uygundur", "Tesiste eksikliğe ve hataya rastlanmamıştır.", "Tamamlandı"], answer: 2 },
+		  { question: "Kabul heyeti tutanağında transformatör bilgilerinin yazıldığı kısım hangisidir?", options: ["İlk Sayfa", "Tesise Ait Bilgiler", "Özür ve Eksiklikler", "Jeneratörler, transformatörler ve diğer cihazlar"], answer: 3 },
+		  { question: "Proje ile sahadaki tesis arasında farklılık varsa ne yapılır?", options: ["Kabul tamamlanır", "Tadilat projesi istenir", "Eksiklikler görmezden gelinir", "Yüklenici değiştirilir"], answer: 1 },
+		  { question: "Kabul heyetinde kimler yer alabilir?", options: ["Valilik temsilcisi", "Üretici firma sahibi", "Proje müellifi", "Branş mühendisleri ve yetkilendirilmiş kişiler"], answer: 3 },
+		  { question: "Kabul başvuru dosyasında yükleniciye ait hangi belge bulunmalıdır?", options: ["Vergi levhası", "Yetkilendirme yazısı", "Taahhütname", "Kira sözleşmesi"], answer: 1 },
+		  { question: "Şebeke işletim sistemi kabulü için kabul heyetine kimler katılır?", options: ["Yalnızca TEDAŞ personeli", "Yalnızca yüklenici", "Yetkilendirilmiş branş mühendisleri", "İlçe belediyesi temsilcisi"], answer: 2 },
+		  { question: "Kesin kabulde tesisin hangi özelliği kontrol edilmez?", options: ["Can ve mal emniyeti", "Tesisin enerji verilip verilmediği", "Malzeme hasarı", "Eksik işlerin giderilip giderilmediği"], answer: 1 },
+		  { question: "Tesisin geçici kabulü en erken hangi sürede kesin kabul yapılabilir?", options: ["Hemen", "3 ay", "6 ay", "1 yıl"], answer: 3 },
+		  { question: "Kabul işlemleri sırasında transpozisyon noktaları hangi durumda kontrol edilir?", options: ["500 metrelik kablolarda", "2000 m’yi geçen YG kablolarda", "AG şebekede", "Kompanzasyon yapılmış sistemde"], answer: 1 },
+		  { question: "Ara verme süresi sonunda eksik işler tamamlanmazsa ne olur?", options: ["Yeni süre verilir", "Kabul tamamlanır", "Kabul reddedilir", "Fotoğraf istenir"], answer: 2 },
+		  { question: "Kabul tutanağı geçerli sayılması için hangi onayı almalıdır?", options: ["Yüklenici onayı", "Valilik onayı", "POB onayı", "Şantiye sorumlusu onayı"], answer: 2 },
+		  { question: "Kabul tutanakları en az kaç kişi tarafından imzalanır?", options: ["1", "2", "3", "Heyet üyeleri sayısı kadar"], answer: 3 },
+		  { question: "Kabul tutanağı hangi renkte kalemle yazılmalıdır?", options: ["Mavi", "Siyah", "Kırmızı", "Yeşil"], answer: 1 },
+		  { question: "Kabul işlemleri yapılırken hangi kurumun teknik şartnamesi esas alınmazsa ne aranır?", options: ["TEDAŞ", "TSE/EN/IEC gibi standartlar", "ISO", "HD/VDE gibi uluslararası standartlar"], answer: 2 },
+		  { question: "Tesisin kabule hazır olduğuna dair tutanak kim tarafından imzalanır?", options: ["Yüklenici", "İl Özel İdaresi", "Dağıtım lisansı sahibi şirket yetkilisi", "Valilik"], answer: 2 },
+		  { question: "İflas eden yüklenici yoksa, geçici kabulde yükleniciden hangi belge istenir?", options: ["İflas belgesi", "Vekaletname", "Yetkilendirme yazısı", "İzin formu"], answer: 2 },
+		  { question: "Kabul heyetinin üyelerinden biri katılamazsa ne yapılır?", options: ["Kabul iptal edilir", "Yazı ile bildirim yapılır, yeni üye görevlendirilir", "Eksik yapılır", "Tarih ertelenir"], answer: 1 },
+		  { question: "Kabul sırasında tesisin keşif bedeli ile eksiklerin maliyeti %5’ten fazlaysa ne olur?", options: ["Kabul yapılır", "Ek süre verilir", "Tutanak tutulur", "Kabul reddedilir"], answer: 3 },
+		  { question: "Kabul tutanağı kapak sayfasında tesisin hangi bilgileri yer almalıdır?", options: ["Yalnızca tesis adı", "Tesisin adresi, adı, kabul tarihi, sayfa sayısı", "Kabul heyeti üyelerinin özgeçmişi", "Tesisin plan çizimi"], answer: 1 },
+		  { question: "Aydınlatma tesislerinin kabulünde hangi sistemin kapsamına alınması kontrol edilir?", options: ["OG Scada Sistemi", "OG GSM Kumanda", "OSOS (Otomatik Sayaç Okuma Sistemi)", "OG Ring Sistemi"], answer: 2 },
+		  { question: "Kabulü yapılacak malzemelerin imal tarihi ile tesis yılı arasındaki fark en fazla kaç yıl olabilir?", options: ["1", "2", "3", "5"], answer: 2 },
+		  { question: "Tesisin enerji verildiğini belirten yazı hangi kurum/kişiye sunulur?", options: ["TEDAŞ Genel Müdürü", "Yüklenici", "İlgili mülki idare", "İl Özel İdaresi"], answer: 2 },
+		  { question: "Eksik ve hatalı işlerin tadilat projesi ile giderilmesi için kabule ara verildiğinde ne yapılır?", options: ["Yeni kabul başvurusu yapılır", "Kabul iptal edilir", "Makul bir süre belirlenir", "Heyet yeniden oluşturulur"], answer: 2 },
+		  { question: "Ara verilen kabul işlemine devam edilmeden önce eksikliklerin giderildiği nasıl bildirilir?", options: ["Sözlü beyan ile", "E-posta veya yazılı bildirimle", "Telefonla arama ile", "İhale makamına başvurularak"], answer: 1 },
+		  { question: "Kabul heyeti tarafından açılması istenen sondaj çukuru neyi kontrol etmek içindir?", options: ["Zemin sertliğini", "Kanalın kablo yerleşimini", "Proje maliyetini", "Topraklamayı"], answer: 1 },
+		  { question: "Kabulde topraklama ölçümü hangi belgeyle birlikte sunulmalıdır?", options: ["Mühendis odası belgesi", "Güncel kalibrasyon raporu", "Elektrik ruhsatı", "Tesis planı"], answer: 1 },
+		  { question: "Kabulde kullanılan cihazın hangi özelliği belgelenmelidir?", options: ["Markası", "Menşei", "Kalibrasyon durumu", "Ağırlığı"], answer: 2 },
+		  { question: "Kesin kabul yapılabilmesi için tesisin işletme süresi en az ne kadar olmalıdır?", options: ["3 ay", "6 ay", "1 yıl", "2 yıl"], answer: 2 },
+		  { question: "Kabul heyeti hangi durumda geçici kabul yapamaz?", options: ["Eksik iş varsa", "Kabul tutanakları yazılmamışsa", "Tesis çalışmıyorsa", "Yüklenici katılmazsa"], answer: 0 },
+		  { question: "Elektrik tesisleri kabul tutanağı hangi formata göre düzenlenmelidir?", options: ["TEDAŞ teknik şartnamesi", "Elektrik Tesisleri Kabul Yönetmeliği eki", "Dağıtım Lisansı Belgesi", "İlgili belediye yazısı"], answer: 1 },
+		  { question: "Kabul tutanaklarında hangi yazım özelliği korunmalıdır?", options: ["Farklı karakter kullanılabilir", "Yalnızca italik olmalı", "Tüm sayfalar aynı yazı karakterinde olmalıdır", "El yazısı kabul edilir"], answer: 2 },
+		  { question: "Ret tutanağının kabul görmesi için kim tarafından imzalanması gerekir?", options: ["Yalnız yüklenici", "Kabul heyeti", "Şantiye şefi", "Mülki idare amiri"], answer: 1 },
+		  { question: "Kabul sırasında hangi durum enerji verilmesine engel değildir?", options: ["Eksik evrak", "Yüklenicinin katılmaması", "Kanal kazısının yapılmaması", "Topraklama yapılmaması"], answer: 1 },
+		  { question: "Eksikliklerin giderilmesi için ikinci defa süre verilmesi hangi durumda mümkündür?", options: ["Her zaman", "Gerekçeleriyle bildirilmesi halinde", "TEDAŞ isterse", "Valilik isterse"], answer: 1 },
+		  { question: "Kabul heyeti başkanı hangi durumda tekrar saha tespiti yapar?", options: ["Eksik evrak varsa", "Enerji verilmemişse", "Eksikliklerin giderildiği bildirildiyse", "İlk heyet yetersizse"], answer: 2 },
+		  { question: "Kabul tutanakları hangi kurumun personeline gönderilir?", options: ["Belediye", "Enerji Bakanlığı", "Dağıtım şirketi", "EDAŞ/OSB ve yüklenici dahil tüm ilgililer"], answer: 3 },
+		  { question: "Eksik ve hatalı işler giderilmemişse kabul işlemi ne şekilde sonlandırılır?", options: ["Tutanakla reddedilir", "Yeni başvuru açılır", "İade yazısı yazılır", "Süre verilir"], answer: 0 },
+		  { question: "Kabul başvurusu hangi durumda geçerli sayılır?", options: ["Eksik evrakla birlikte", "Enerji verildikten sonra", "Eksiksiz evrak ve ücret ödendiyse", "Yüklenici imzalıysa"], answer: 2 },
+		  { question: "Kabul heyetinde görevli mühendislerin uzmanlık alanı neye göre belirlenir?", options: ["Mühendisin yaşı", "Üniversite mezuniyet yılı", "Branş ihtiyacına göre", "Yüklenicinin tercihi"], answer: 2 },
+		  { question: "Kesin kabul için istenen belgeler arasında hangisi yer almaz?", options: ["Geçici kabul tutanağı", "Kesin proje", "Kalibrasyon raporu", "Yapı kullanım izin belgesi"], answer: 3 },
+		  { question: "Kabul heyeti raporları hangi formatta teslim edilir?", options: ["El yazısı", "Sadece dijital", "Fiziki ve dijital", "Sözlü beyan"], answer: 2 },
+		  { question: "Kabul sırasında eksiklik olması durumunda tutanağa ne yazılır?", options: ["Tesis uygun", "Geçici kabul yapılamaz", "Eksik işler tamamlanmalı", "Red kararı alınmıştır"], answer: 2 },
+		  { question: "Kabul başvurusu sırasında ödeme yapılmamışsa ne olur?", options: ["Kabul yapılır", "Başvuru iptal edilir", "Eksik belgelerle işlem devam eder", "Yükleniciye ceza kesilir"], answer: 1 },
+		  { question: "Kesin kabul tutanakları hangi belgelerle birlikte sunulmalıdır?", options: ["Yüklenici beyannamesi", "Enerji izin yazısı", "Fotoğraf raporu", "Kabul başvuru formu"], answer: 2 },
+		  { question: "Kabul heyetinde bulunan kişilerin görev dağılımı nasıl yapılır?", options: ["Kura ile", "Başkan tarafından", "Valilikçe", "Yüklenici isterse"], answer: 1 },
+		  { question: "Kabul tutanağında imzası eksik olan kişi olursa ne olur?", options: ["Tutanak geçerli sayılır", "Tutanak iptal edilir", "İlgili kişiye tekrar imza attırılır", "Yeni tutanak hazırlanır"], answer: 1 },
+		  { question: "Tesis kabulünde enerji verilmemesi neyi gösterir?", options: ["Tesisin tamamlanmadığını", "Yüklenicinin kusurunu", "Eksik proje olduğunu", "Tesisin faaliyete geçmediğini"], answer: 0 },
+		  { question: "Kabul heyeti üyeleri kaç gün içinde görevli olduklarına dair bildirim almalıdır?", options: ["1", "3", "5", "7"], answer: 2 },
+		  { question: "Kabul heyeti tarafından düzenlenen fotoğraf raporunda hangi bilgiler yer almalıdır?", options: ["Fotoğraf çekim tarihi ve konumu", "Yalnızca görüntü", "Yüklenici adı", "Fatura bilgisi"], answer: 0 },
+		  { question: "Kabul işleminde görevli mühendis başka bir kurumdan ise ne gereklidir?", options: ["Eğitim sertifikası", "Görevlendirme yazısı", "Kabul eğitimi", "Valilik onayı"], answer: 1 },
+		  { question: "Kabul sırasında transformatör etiket bilgileri hangi belge ile karşılaştırılır?", options: ["Enerji izin formu", "Fatura", "Tesis projesi", "Kabul başvuru formu"], answer: 2 },
+		  { question: "Topraklama ölçüm cihazının kalibrasyon süresi geçmişse ne olur?", options: ["Kabul yapılmaz", "Uyarı verilir", "Yeniden ölçüm istenir", "İlgiliye yazı yazılır"], answer: 0 },
+		  { question: "Kabul başvurusu yapılmadan önce hangi işlem tamamlanmalıdır?", options: ["Enerji verilmesi", "Tesisin çalıştırılması", "Evrak teslimi", "Kurum içi yazışma"], answer: 2 },
+		  { question: "Geçici kabul heyetinde bulunan kişi kesin kabulde tekrar görev alabilir mi?", options: ["Evet", "Hayır", "Sadece mühendis ise", "Sadece TEDAŞ personeli ise"], answer: 1 },
+		  { question: "Kesin kabul tutanağında belirtilen eksiklikler hangi aşamada tekrar kontrol edilir?", options: ["Yeni başvuruda", "Yıl sonunda", "İzleme sürecinde", "Saha kontrolünde"], answer: 3 },
+		  { question: "Kabul sırasında geçici kabul hizmet bedeli ödenmemişse hangi işlem yapılır?", options: ["Kabul yapılmaz", "Tutanak düzenlenir", "Fatura kesilir", "POB bilgilendirilir"], answer: 0 },
+		  { question: "Kabul heyeti tarafından tutulan tutanak kaç nüsha hazırlanır?", options: ["1", "2", "3", "4"], answer: 2 },
+		  { question: "Kabul heyeti hangi durumda yeniden oluşturulur?", options: ["İtiraz varsa", "Evrak eksikse", "Tesis büyürse", "Başkan görevden ayrılırsa"], answer: 0 }
+		];
+
+        let currentQuestion = 0;
+        let score = 0;
+        const questionEl = document.getElementById("question");
+        const optionsEl = document.getElementById("options");
+        const resultEl = document.getElementById("result");
+        const nextBtn = document.getElementById("nextBtn");
+        const scoreBox = document.getElementById("scoreBox");
+
+        function loadQuestion() {
+            const allNavItems = document.querySelectorAll('#questionList li');
+            allNavItems.forEach((item, idx) => {
+                item.classList.remove('active');
+                if (idx === currentQuestion) {
+                    item.classList.add('active');
+                }
+            });
+
+            const questionList = document.getElementById("questionList");
+            if (questionList && questionList.children.length === 0) {
+                questions.forEach((q, i) => {
+                    const li = document.createElement("li");
+                    li.textContent = `Soru ${i + 1}`;
+                    li.onclick = () => {
+                        currentQuestion = i;
+                        loadQuestion();
+                    };
+                    questionList.appendChild(li);
+                });
+            }
+
+            const q = questions[currentQuestion];
+            questionEl.textContent = `Soru ${currentQuestion + 1}: ${q.question}`;
+            optionsEl.innerHTML = "";
+            resultEl.textContent = "";
+            nextBtn.style.display = "none";
+            scoreBox.textContent = `Puan: ${score} / ${questions.length}`;
+
+            q.options.forEach((opt, index) => {
+                const li = document.createElement("li");
+                const btn = document.createElement("button");
+                btn.textContent = `${harfler[index]}) ${opt}`;
+                btn.onclick = () => checkAnswer(index, btn);
+                li.appendChild(btn);
+                optionsEl.appendChild(li);
+            });
+        }
+
+        function checkAnswer(selected, btnClicked) {
+            const q = questions[currentQuestion];
+            const buttons = document.querySelectorAll(".options button");
+
+            buttons.forEach((btn, idx) => {
+                btn.disabled = true;
+                btn.classList.remove("correct", "incorrect");
+                if (idx === q.answer) {
+                    btn.classList.add("correct");
+                }
+            });
+
+            if (selected === q.answer) {
+                score++;
+                resultEl.textContent = "Doğru cevap!";
+                resultEl.className = "result correct";
+            } else {
+                resultEl.textContent = "Yanlış cevap.";
+                resultEl.className = "result incorrect";
+                btnClicked.classList.add("incorrect");
+            }
+
+            nextBtn.style.display = "inline-block";
+            scoreBox.textContent = `Puan: ${score} / ${questions.length}`;
+        }
+
+        nextBtn.onclick = () => {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+            } else {
+                questionEl.textContent = "Test tamamlandı!";
+                optionsEl.innerHTML = "";
+                nextBtn.style.display = "none";
+                resultEl.textContent = `Tebrikler! ${score} / ${questions.length} doğru cevap verdiniz.`;
+                resultEl.className = "result correct";
+            }
+        };
+
+        loadQuestion();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>rA | Elektrik Kuvvetli Akım Tesislerinde Uygulanacak Bakım Usul ve Esasları Testi</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(120deg, #f0f4f8, #d9e2ec);
+            margin: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-bottom: 20px;
+        }
+
+		.quiz-container {
+			background: #ffffff;
+			padding: 50px;
+			border-radius: 24px;
+			box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+			max-width: 100%;
+			width: 70%;  /* PC'de genişliği %70 yapıyoruz */
+			box-sizing: border-box;
+			margin: 20px;
+			margin-left: 20%;  /* Sol taraftan %10 boşluk bırakarak sağa kaydırıyoruz */
+		}
+
+        .question {
+            font-size: 24px;
+            margin-bottom: 30px;
+            font-weight: 600;
+            color: #102a43;
+            text-align: center;
+        }
+
+        .options {
+            list-style: none;
+            padding: 0;
+        }
+
+        .options li {
+            margin-bottom: 18px;
+        }
+
+        .options button {
+            width: 100%;
+            text-align: left;
+            background: #e3ebf6;
+            border: none;
+            border-radius: 10px;
+            padding: 16px 24px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        .options button:hover {
+            background: #c7d7ea;
+            transform: scale(1.01);
+        }
+
+        .options button.correct {
+            background-color: #38a169 !important;
+            color: white;
+            font-weight: bold;
+        }
+
+        .options button.incorrect {
+            background-color: #e53e3e !important;
+            color: white;
+            font-weight: bold;
+        }
+
+        .result {
+            margin-top: 30px;
+            font-weight: bold;
+            font-size: 20px;
+            text-align: center;
+        }
+
+        .result.correct {
+            color: green;
+        }
+
+        .result.incorrect {
+            color: red;
+        }
+
+        #nextBtn {
+            margin-top: 35px;
+            background: #2b6cb0;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: none;
+            float: right;
+        }
+
+        #nextBtn:hover {
+            background: #2c5282;
+        }
+
+        #scoreBox {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: #2b6cb0;
+        }
+
+        footer {
+            margin-top: 60px;
+            text-align: center;
+            font-size: 15px;
+            color: #555;
+        }
+
+		.question-navigation {
+			position: fixed;
+			left: 0;
+			top: 0;
+			bottom: 0;
+			width: 140px; /* Genişliği küçülttük */
+			overflow-y: auto;
+			background: #e2e8f0;
+			padding: 20px;
+			box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+			z-index: 1;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: flex-start;
+		}
+
+		.question-navigation a,
+		.question-navigation h3 {
+			text-align: center; /* Link ve başlıkları ortalar */
+			width: 100%;
+		}
+
+		.question-navigation a {
+			text-decoration: none;
+			font-size: 18px;
+			margin-bottom: 20px;
+			color: white;  /* Yazı rengini beyaz yapalım */
+			background-color: #38a169;  /* Yeşil arka plan rengi */
+			padding: 10px 20px;  /* Düğmeye biraz iç boşluk ekleyelim */
+			border-radius: 8px;  /* Kenarlarını yuvarlayalım */
+			font-weight: bold;
+			display: block;  /* Linkin tüm alanını tıklanabilir yapar */
+			text-align: center;  /* Yazıyı ortalar */
+			transition: background-color 0.3s ease;  /* Hover efekti eklerken yumuşak geçiş sağlar */
+		}
+
+		.question-navigation h3 {
+			font-size: 18px;
+			margin-bottom: 10px;
+		}
+
+        .question-navigation a:hover {
+            background-color: #2f855a;
+        }
+
+        .question-list {
+            padding-left: 20px;
+            font-size: 14px;
+            line-height: 1.6;
+            list-style: none;
+        }
+
+        .question-list li {
+            background: white;
+            padding: 6px 10px;
+            border-radius: 6px;
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            margin-bottom: 6px;
+        }
+
+        .question-list li.active {
+            font-weight: bold;
+            color: #2b6cb0;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+                overflow-y: auto;
+                align-items: flex-start;
+                padding: 20px;
+            }
+
+            .quiz-container {
+                margin-left: 0 !important;
+                margin-top: 20px;
+                padding: 24px;
+                width: 100%;
+                max-width: 100%;
+            }
+
+			.question-navigation {
+				position: static;
+				width: 100%;  /* Mobil görünümde genişlik %100 olacak */
+				box-shadow: none;
+				margin-bottom: 20px;
+				padding: 10px;
+				margin-top: 10px;
+			}
+
+            .question-navigation a {
+                width: auto;
+                padding: 8px 16px;
+                font-size: 16px;
+            }
+
+            .question-list {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 6px;
+                padding-left: 0;
+                justify-content: center;
+            }
+
+            .question-list li {
+                flex: 0 0 auto;
+                font-size: 14px;
+                padding: 6px 10px;
+                border-radius: 6px;
+                box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+                cursor: pointer;
+            }
+
+            .question-list li.active {
+                font-weight: bold;
+                color: #2b6cb0;
+            }
+
+            .question {
+                font-size: 20px;
+            }
+
+            .options button {
+                font-size: 16px;
+                padding: 12px 18px;
+            }
+
+            #nextBtn {
+                float: none;
+                display: block;
+                margin: 30px auto 0 auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .question-navigation {
+                width: 100%;
+                padding: 8px;
+            }
+
+            .question-navigation a {
+                font-size: 14px;
+                padding: 8px 12px;
+            }
+
+            .options button {
+                font-size: 14px;
+                padding: 12px;
+            }
+
+            .question {
+                font-size: 18px;
+            }
+
+            #nextBtn {
+                padding: 12px 24px;
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="question-navigation">
+        <a href="index.html">Ana Sayfa</a>
+        <h3>Tüm Sorular</h3>
+        <ol id="questionList" class="question-list"></ol>
+    </div>
+
+    <div class="quiz-container">
+        <div id="quiz">
+            <div class="question" id="question"></div>
+            <ul class="options" id="options"></ul>
+            <button id="nextBtn" type="button">Sonraki Soru</button>
+            <div class="result" id="result"></div>
+            <div id="scoreBox"></div>
+        </div>
+        <footer>
+            Bu test <strong>Elektrik Kuvvetli Akım Tesislerinde Uygulanacak Bakım Usul ve Esasları</strong> temel alınarak hazırlanmıştır.<br />
+            [ ramazan.bozkurt@tedas.gov.tr ]
+        </footer>
+    </div>
+
+    <script>
+        const harfler = ["A", "B", "C", "D"];
+		const questions = [
+		  { question: "Aşağıdakilerden hangisi 'Elektrik Kuvvetli Akım Tesislerinde Uygulanacak Bakım Usul ve Esasları'nın temel amaçlarından biridir?", options: ["Dağıtım şebekelerinde üretim kapasitesini artırmak", "Elektrik enerjisini sadece sanayicilere sağlamak", "Elektrik işletme elemanlarının ekonomik ömrünü uzatmak", "Abonelerin sayaç tipini belirlemek"], answer: 2 },
+		  { question: "Bu usul ve esaslar, enerji arzında hangi temel unsuru artırmayı hedeflemektedir?", options: ["Bireysel tüketim", "İhracat kapasitesi", "Kalite ve süreklilik", "Lisans başvuru sayısı"], answer: 2 },
+		  { question: "Bakım faaliyetlerinin milli ekonomiye katkısı aşağıdakilerden hangisiyle doğrudan ilişkilidir?", options: ["Elektrik faturalarının merkezi sistemle gönderilmesi", "Enerji ithalatının artırılması", "Elektrik işletme elemanlarının daha sık değiştirilmesi", "Elektrik işletme elemanlarının ömrünün uzatılması"], answer: 3 },
+		  { question: "Bu usul ve esaslar, hangi gerilim seviyesine kadar olan elektrik tesislerini kapsar?", options: ["11 kV", "24 kV", "36 kV", "72 kV"], answer: 2 },
+		  { question: "Aşağıdaki tesislerden hangisi bu dokümanın kapsamı dışındadır?", options: ["34,5 kV’luk şehir içi dağıtım şebekesi", "0,4 kV’luk alçak gerilim panosu", "154 kV’luk iletim hattı", "Dağıtım transformatör merkezi"], answer: 2 },
+		  { question: "“Elektrik Kuvvetli Akım Tesislerinde Uygulanacak Bakım Usul ve Esasları” belgesi hangi faaliyetleri düzenlemektedir?", options: ["Elektrik üretim ve ithalat faaliyetleri", "Elektrik enerjisi satışı ve tarifelendirme süreci", "Elektrik kuvvetli akım tesislerinde yapılacak bakım faaliyetleri", "Yenilenebilir enerji lisans başvuruları"], answer: 2 },
+		  { question: "Bu Usul ve Esaslar hangi yönetmeliğe dayanılarak hazırlanmıştır?", options: ["Elektrik Piyasası Lisans Yönetmeliği", "Elektrik Kuvvetli Akım Tesisleri Yönetmeliği", "Enerji Verimliliği Yönetmeliği", "Elektrik Piyasası Dağıtım Yönetmeliği"], answer: 1 },
+		  { question: "Bu belge hangi tarihli Cumhurbaşkanlığı Kararnamesine dayanır?", options: ["10/07/2018", "01/01/2020", "15/04/2016", "30/11/2000"], answer: 0 },
+		  { question: "Belgede adı geçen 'Elektrik Kuvvetli Akım Tesisleri Yönetmeliği' ilk olarak ne zaman yayımlanmıştır?", options: ["2002", "2010", "2005", "2000"], answer: 3 },
+		  { question: "Aşağıdakilerden hangisi 'aktif bölüm' olarak tanımlanır?", options: ["Sadece gerilimsiz bağlantılar", "İzole edilmiş kablo ucu", "Normal işletme koşullarında gerilim altında olan iletkenler", "Topraklanmış şebeke hattı"], answer: 2 },
+		  { question: "Bakım faaliyetlerinin belgelendirilmesinde aşağıdakilerden hangisi esas alınır?", options: ["Sözlü beyan", "Gözlem raporu", "Yazılı tutanak ve çizelgeler", "Elektrik faturası"], answer: 2 },
+		  { question: "Elektrik tesislerinde yapılacak bakımın en önemli amacı nedir?", options: ["Personel sayısını azaltmak", "Arızaları gizlemek", "İşletme güvenliğini artırmak", "Yedek parça kullanımını azaltmak"], answer: 2 },
+		  { question: "Bakım periyodu belirlenirken hangi unsur dikkate alınmaz?", options: ["Tesisin yaşı", "Çevre koşulları", "Ekipmanın katalog bilgileri", "İşçilerin mesaisi"], answer: 3 },
+		  { question: "Aşağıdakilerden hangisi 'önleyici bakım' olarak adlandırılır?", options: ["Arıza sonrası müdahale", "Tüketici şikayeti sonrası işlem", "Arıza oluşmadan yapılan planlı bakım", "Yalnızca temizlik işlemleri"], answer: 2 },
+		  { question: "Kestirimci bakımın temel yöntemi nedir?", options: ["Deneme-yanılma", "Personel gözlemi", "Durum izleme ve analiz", "Fatura karşılaştırması"], answer: 2 },
+		  { question: "Arıza bakımının dezavantajı nedir?", options: ["Planlı olması", "Yüksek verimlilik sağlaması", "Beklenmedik duruşa yol açması", "Ekipman ömrünü artırması"], answer: 2 },
+		  { question: "Elektrik tesislerinde bakım yapacak personelin niteliği nasıl olmalıdır?", options: ["Deneyimsiz olabilir", "Yalnızca gözlem yapması yeterlidir", "İlgili teknik eğitimleri almış olmalıdır", "İSG kuralları dışı çalışabilir"], answer: 2 },
+		  { question: "Bakım ekipmanlarının kontrolü ne zaman yapılmalıdır?", options: ["Yılda bir kez", "Bakım bittikten sonra", "Bakım öncesi ve sonrası", "Arızadan sonra"], answer: 2 },
+		  { question: "Aşağıdakilerden hangisi bakım güvenliğini sağlamak için alınması gereken önlemlerden biri değildir?", options: ["Gerilim kesilmesi", "Topraklama yapılması", "Yalnız çalışılması", "Uyarı levhalarının konulması"], answer: 2 },
+		  { question: "Elektrik tesislerinde bakım planı neye göre hazırlanır?", options: ["Personelin isteğine", "Tüketici talebine", "Tesisin işletme ve bakım tarihçesine", "Elektrik faturasına"], answer: 2 },
+		  { question: "Termal kamerayla yapılan test hangi bakım yöntemine örnektir?", options: ["Kestirimci bakım", "Düzeltici bakım", "Temizlik bakımı", "Koruyucu bakım"], answer: 0 },
+		  { question: "İzolasyon direnci testi aşağıdakilerden hangisi için yapılır?", options: ["Toprak ölçümünün kontrolü", "Kablo kesit ölçümü", "Yalıtım durumunun tespiti", "Gerilim seviyesi ölçümü"], answer: 2 },
+		  { question: "Topraklama direnci ölçümü ne zaman yapılmalıdır?", options: ["Her 10 yılda bir", "Ekipman arızalandığında", "Periyodik olarak ve bakım sırasında", "Yalnızca kurulum sırasında"], answer: 2 },
+		  { question: "Tesisin işletme süresi bakım planlamasında nasıl rol oynar?", options: ["Etki etmez", "Bakım sıklığını azaltır", "Planlı bakım sıklığını artırır", "Yalnızca yeni tesislerde önemlidir"], answer: 2 },
+		  { question: "Bakım sırasında elektriksel riskleri azaltmak için aşağıdakilerden hangisi yapılmalıdır?", options: ["Ekipmanlar çalışır haldeyken bakım yapılmalıdır", "Bakım sahasında yalnızca bir kişi bulunmalıdır", "Enerji kesilmeli ve güvenli ortam sağlanmalıdır", "Zaman kazanmak için hızlı geçiş yapılmalıdır"], answer: 2 },
+		  { question: "Bakım prosedürleri hazırlanırken aşağıdakilerden hangisi dikkate alınmaz?", options: ["İş akış planı", "Üretici talimatı", "Ulusal ve uluslararası standartlar", "Reklam kampanyaları"], answer: 3 },
+		  { question: "Bakım faaliyetlerinde karşılaşılan kazaların temel nedeni nedir?", options: ["İyi havalarda çalışılması", "Yeterli eğitim ve önlem alınmaması", "Aşırı personel görevlendirilmesi", "Ekipmanın yeni olması"], answer: 1 },
+		  { question: "Aşağıdakilerden hangisi bakım belgelerinde yer almaz?", options: ["Bakım tarihleri", "Yapılan işlemler", "Personel bilgileri", "Şirketin kâr oranı"], answer: 3 },
+		  { question: "Koruyucu bakımın temel avantajı nedir?", options: ["Ekipmanın ömrünü kısaltması", "Arıza riskini artırması", "Arızaların önlenmesine yardımcı olması", "Maliyetleri yükseltmesi"], answer: 2 },
+		  { question: "Planlı bakımın temel özelliği nedir?", options: ["Tesadüfi yapılması", "Belirli aralıklarla yapılması", "Sadece arıza sonrası uygulanması", "Sürekli kontrol yapılmaması"], answer: 1 },
+		  { question: "Aşağıdakilerden hangisi bakım sonrası yapılması gereken işlemlerden biridir?", options: ["Bakım formunun imzalanmadan bırakılması", "Ekipmanın enerjilenmesi ve test edilmesi", "Tüm verilerin silinmesi", "Bakım yapılmadan rapor düzenlenmesi"], answer: 1 },
+		  { question: "Yüksek gerilimde çalışmalarda alınacak önlem aşağıdakilerden hangisidir?", options: ["Koruyucu gözlük takmak yeterlidir", "Mutlaka izole eldiven ve ayakkabı kullanılmalıdır", "Sadece baret yeterlidir", "Yalnızca eğitimli olmayan personel girebilir"], answer: 1 },
+		  { question: "Termografik ölçümler aşağıdaki hangi bakım türü için kullanılır?", options: ["Önleyici bakım", "Kestirimci bakım", "Düzeltici bakım", "Temizlik bakımı"], answer: 1 },
+		  { question: "Topraklama sistemi kontrolünde hangi ölçüm cihazı kullanılır?", options: ["Multimetre", "Megger", "Kömür test cihazı", "Toprak megeri"], answer: 3 },
+		  { question: "Topraklama direnci en fazla ne kadar olmalıdır?", options: ["1 ohm", "5 ohm", "10 ohm", "100 ohm"], answer: 0 },
+		  { question: "Kablo başlıkları hangi bakım faaliyetleri sırasında kontrol edilmelidir?", options: ["Sadece devreye alma sırasında", "Kış aylarında", "Periyodik bakım sırasında", "Arıza sonrası"], answer: 2 },
+		  { question: "Sigorta bağlantılarında gevşeme olup olmadığı nasıl tespit edilir?", options: ["Elle kontrol edilir", "Termal kamera ile görüntülenir", "Zıplama testi yapılır", "Şalter açılarak bakılır"], answer: 1 },
+		  { question: "Dağıtım trafolarında yağ seviyesi hangi periyotta kontrol edilmelidir?", options: ["Yılda bir", "Ayda bir", "Haftada bir", "Her bakım sonrası"], answer: 0 },
+		  { question: "Kesici ve ayırıcı kontaklarının temizliği neden önemlidir?", options: ["Sadece estetik amaçlıdır", "Temas direncini azaltmak ve aşırı ısınmayı önlemek için", "Etiket görünürlüğünü sağlamak için", "Koruma rölesi ile uyumlu olması için"], answer: 1 },
+		  { question: "Yıldırımdan korunma tesisatında hangi bakım faaliyeti yapılmalıdır?", options: ["Topraklama ölçümü", "Sigorta değişimi", "Bina boyası kontrolü", "İzolatör temizlik"], answer: 0 },
+		  { question: "Kesici mekanizmalarının yağlanması hangi bakım türüne girer?", options: ["Arıza bakımı", "Koruyucu bakım", "Temizlik bakımı", "Elektriksel test"], answer: 1 },
+		  { question: "Gerilim dedektörü ile yapılan kontrol neyi ifade eder?", options: ["Yalıtkanlık testini", "Gerilim varlığını", "Toprak ölçümünü", "Akım yönünü"], answer: 1 },
+		  { question: "Kompanzasyon panolarında yapılacak bakım öncesi ilk adım nedir?", options: ["Sigortaları kapatmak", "Fanları temizlemek", "Kapasitörleri değiştirmek", "Enerjiyi kesmek ve kilitlemek"], answer: 3 },
+		  { question: "SCADA sistemleri ile bakım arasındaki ilişki nedir?", options: ["SCADA sadece üretimi gösterir", "Bakım sırasında SCADA devre dışı bırakılır", "SCADA ile uzaktan izleme yapılabilir", "SCADA sadece trafo merkezinde çalışır"], answer: 2 },
+		  { question: "Trafo yağ testi neyi tespit eder?", options: ["Gerilim dengesini", "Toprak arızasını", "İçsel bozulmaları ve yalıtım durumunu", "Bina ısısını"], answer: 2 },
+		  { question: "Kompanzasyon sistemlerinde arızalı kondansatör nasıl tespit edilir?", options: ["Görsel olarak", "Akım ve gerilim ölçümleri ile", "Etiket kontrolüyle", "Kablo rengine göre"], answer: 1 },
+		  { question: "AG panolarında yapılacak bakım sırasında hangi ESD önlemi alınmalıdır?", options: ["Eller ıslatılır", "Antistatik bileklik ve paspas kullanılır", "Bakım sırasında ayakkabı çıkarılır", "Direkt toprak hattı bağlanır"], answer: 1 },
+		  { question: "Parafudrlar hangi riske karşı korunma sağlar?", options: ["Aşırı akım", "Yüksek sıcaklık", "Toprak hatası", "Ani gerilim yükselmeleri (surge)"], answer: 3 },
+		  { question: "Yalıtkan eldivenler hangi testten geçirilmelidir?", options: ["Gerilim dayanım testi", "Ağırlık testi", "Elastikiyet testi", "Görsel test"], answer: 0 },
+		  { question: "Aşağıdakilerden hangisi bakım dokümantasyonunda bulunması gereken bir içerik değildir?", options: ["Tarih ve saat bilgisi", "Bakım yapan personel", "Ekipman seri numarası", "Personelin medeni durumu"], answer: 3 },
+		  { question: "Yüksek gerilim hatlarında çalışma yapılmadan önce aşağıdakilerden hangisi mutlaka uygulanmalıdır?", options: ["Eldiven kontrolü", "Hat geriliminin kesilip topraklanması", "Sigorta testi", "Kablo ölçümü"], answer: 1 },
+		  { question: "Topraklama sisteminde direnç değeri yüksek çıkarsa ne yapılmalıdır?", options: ["Hiçbir şey yapılmaz", "Topraklayıcı arttırılır veya sistem yenilenir", "Sisteme su dökülür", "Gerilim yükseltilir"], answer: 1 },
+		  { question: "Termal kamera ile yapılan incelemelerde anormal sıcaklık farkı neye işaret eder?", options: ["Faydalı çalışmaya", "Yetersiz enerjiye", "Gevşek bağlantı veya yük dengesizliğine", "İyi topraklamaya"], answer: 2 },
+		  { question: "İzolasyon testi neyi ölçer?", options: ["Akım yönünü", "Gerilim büyüklüğünü", "İletkenin iletkenliğini", "Yalıtım direncini"], answer: 3 },
+		  { question: "Enerji kesilmeden bakım yapılması gerekiyorsa hangi yöntem kullanılır?", options: ["Soğuk çalışma", "Sıcak çalışma", "Yalıtımsız müdahale", "İzoleli çalışma"], answer: 3 },
+		  { question: "Alçak gerilim panolarında yedek sigortalar neden bulundurulmalıdır?", options: ["Estetik amaçlı", "Arıza halinde hızlı müdahale için", "Personel bilgisi için", "Pano süsü olarak"], answer: 1 },
+		  { question: "Kompanzasyon sisteminde sürekli olarak ceza gelmesinin nedeni aşağıdakilerden hangisidir?", options: ["Kapasitör değerinin fazla olması", "Reaktif güç sınırlarının aşılması", "Anahtarlama olmaması", "Gerilim düşüklüğü"], answer: 1 },
+		  { question: "İş güvenliği için yapılan kilitleme-etiketleme uygulamasının amacı nedir?", options: ["Bakımı hızlandırmak", "Kazaları önlemek", "Maliyetleri azaltmak", "Yedek parça belirlemek"], answer: 1 },
+		  { question: "Kompanzasyon panolarındaki kontaktörler neden periyodik kontrol edilmelidir?", options: ["Fan sesi için", "Titreşim ve ark kontrolü için", "LED aydınlatma için", "Gerilim düşümünü artırmak için"], answer: 1 },
+		  { question: "SCADA sisteminde bakım uyarısı veren alarm türü aşağıdakilerden hangisidir?", options: ["Analog alarm", "Sıcaklık alarmı", "Bakım takvimi uyarısı", "Enerji kesintisi alarmı"], answer: 2 },
+		  { question: "Topraklama ölçümü sırasında hangi koşul sağlanmalıdır?", options: ["Yağışlı hava", "Kuru zemin", "Nötr iletken devreye alınmış olmalı", "Sistem enerjisiz olmalı"], answer: 3 },
+		  { question: "Yıldırımdan korunma sistemlerinde kullanılan iniş iletkeni hangi test ile kontrol edilir?", options: ["Toprak özgül direnci", "İletkenlik testi", "İzolasyon testi", "Gerilim testi"], answer: 1 },
+		  { question: "Transformatörlerde yağ seviyesi ve rengi aşağıdakilerden hangisini gösterir?", options: ["Bina yaşını", "Yalıtım durumu ve kontaminasyon", "Fatura kalitesini", "Frekans değerini"], answer: 1 },
+		  { question: "İzolasyon testi yapılmadan önce aşağıdakilerden hangisi yapılmalıdır?", options: ["Test sırasında enerji verilmeli", "Test edilecek devre enerjili olmalı", "Devre enerjisi kesilmeli ve boşaltılmalı", "Devreye yük bağlanmalı"], answer: 2 },
+		  { question: "Elektriksel bakım sırasında kullanılan uyarı levhası neyi belirtir?", options: ["İndirimli bakım", "Sigorta değiştirme", "Tehlikeli alan", "Ölçüm noktası"], answer: 2 },
+		  { question: "Renk kodlaması bakım planlamasında ne için kullanılır?", options: ["Ekipman türü belirlemek için", "Bakım periyotlarını ayırt etmek için", "Personel seçimi için", "Enerji sınıfı belirlemek için"], answer: 1 },
+		  { question: "Sigortalı devrelerde bakım yaparken sigortanın durumu ne olmalıdır?", options: ["Devrede olmalı", "Yarı açık", "Açık ve kilitlenmiş", "Çekilmiş ama bağlı"], answer: 2 },
+		  { question: "Gerilim altında çalışmada izole platform kullanmanın amacı nedir?", options: ["Yüksekten korunmak", "Gerilim iletiminin kesilmesi", "Aşırı akımı engellemek", "Yalnızca konfor sağlamak"], answer: 1 },
+		  { question: "Bakım sonrası test sonuçları nereye kaydedilir?", options: ["Rapor kağıdına", "Sözlü beyana", "Bakım kayıt sistemine", "Personel dosyasına"], answer: 2 },
+		  { question: "Kompanzasyon sisteminde sigorta atmasının olası nedeni nedir?", options: ["Kapasitör arızası", "Yük dengesizliği", "Şalter gevşemesi", "Topraklama kopması"], answer: 0 },
+		  { question: "Kesici mekanizmasında gözlemlenen siyahlaşma neyin göstergesi olabilir?", options: ["Yetersiz yağlama", "Aşırı gerilim", "Ark oluşumu ve temas problemi", "Yüksek nem"], answer: 2 },
+		  { question: "Trafo merkezlerinde bakım sırasında hangi kişisel koruyucu donanım zorunludur?", options: ["Kask ve reflektif yelek", "Baret, eldiven, izole ayakkabı", "Gözlük ve maske", "Sadece iş elbisesi"], answer: 1 },
+		  { question: "Trafo yağı analizinde tespit edilen yüksek nem oranı neyi gösterir?", options: ["Yağın kalitesini", "Trafo ömrünün uzunluğunu", "Yalıtımın zayıfladığını ve arıza riskini", "Topraklamanın iyi olduğunu"], answer: 2 },
+		  { question: "Bakım ekibinin güvenliği için aşağıdakilerden hangisi en önce kontrol edilmelidir?", options: ["Bakım listesi", "Enerji kesilmesi ve güvenli kilitleme", "Kullanılan araçlar", "Hava durumu"], answer: 1 },
+		  { question: "Enerji verilmeyen sistemde gerilim olup olmadığını kontrol etmek için ne kullanılır?", options: ["Multimetre", "Gerilim dedektörü", "Ampermetre", "Toprak test cihazı"], answer: 1 },
+		  { question: "Transformatörlerdeki kaçak akımlar genellikle nerede toplanır?", options: ["Toprak hattı", "Nötr hattı", "Sigorta bağlantısı", "Ayırıcı çıkışı"], answer: 0 },
+		  { question: "Yüksek gerilimde çalışmadan önce yapılan topraklama ne sağlar?", options: ["Toprak potansiyelini sıfırlar", "Enerji tüketimini düşürür", "Enerji kalitesini artırır", "Gerilim yükseltir"], answer: 0 },
+		  { question: "Elektrik tesislerinde bakım prosedürlerine uyulmaması neye yol açabilir?", options: ["İletkenlik artar", "Enerji tüketimi düşer", "Ciddi iş kazaları ve arızalar oluşur", "Fatura süresi uzar"], answer: 2 },
+		  { question: "Enerji altında çalışan kişinin kullanması gereken koruyucu ekipmanlardan biri aşağıdakilerden hangisidir?", options: ["Kumaş eldiven", "İzoleli el aletleri", "Çelik burunlu ayakkabı", "Şapka"], answer: 1 },
+		  { question: "Trafo yağının fiziksel özellikleri nasıl kontrol edilir?", options: ["Yalnızca üreticiye sorularak", "Kokusuna bakılarak", "Laboratuvar testleri ile", "Kullanım süresine göre tahminen"], answer: 2 },
+		  { question: "AG pano bakımında ilk yapılması gereken adım nedir?", options: ["Sigorta kontrolü", "Enerjinin kesilmesi ve emniyete alınması", "Kablo bağlantılarını sıkmak", "Etiketleme"], answer: 1 },
+		  { question: "Bakım planları hangi esaslara göre hazırlanmalıdır?", options: ["Müdür isteğine", "Enerji Bakanlığı yönergelerine", "Ulusal standartlar, ekipman katalogları ve işletme geçmişine", "Günlük gözleme"], answer: 2 },
+		  { question: "Yalıtkanlık testi hangi cihazla yapılır?", options: ["Kumpas", "Megger", "Multimetre", "Voltmetre"], answer: 1 },
+		  { question: "Enerji verilmeden önce hangi kontrol mutlaka yapılmalıdır?", options: ["Sigorta testi", "Toprak kontrolü", "Gerilim olup olmadığının tespiti", "Faz sırası kontrolü"], answer: 2 },
+		  { question: "İzole ayakkabılar hangi özellikte olmalıdır?", options: ["Topraklı olmalı", "Deri tabanlı olmalı", "Elektriği iletmemeli", "Islak zeminde kaymalı"], answer: 2 },
+		  { question: "Elektrik ekipmanlarına bakım yapılırken kayıt tutma amacı nedir?", options: ["Denetimi kolaylaştırmak", "Vergi beyanı için", "Malzeme tespiti için", "Çalışma saati takibi için"], answer: 0 },
+		  { question: "Transformatörlerdeki yağ seviyesi hangi göstergeden okunur?", options: ["Basınç rölesi", "Yağ seviyesi göstergesi", "Akım trafosu", "Sıcaklık göstergesi"], answer: 1 },
+		  { question: "Periyodik bakım gerektiren cihazların başında hangisi gelir?", options: ["Fluoresan lamba", "Kontaktör", "Tesisat borusu", "LED ampul"], answer: 1 },
+		  { question: "İş sağlığı ve güvenliği açısından bakım öncesi yapılan risk değerlendirmesi ne sağlar?", options: ["Sigorta seçimi", "Güvenli çalışma ortamı", "Enerji verimliliği", "Kablo numaralandırması"], answer: 1 },
+		  { question: "Bakım esnasında yapılan ölçümlerin kayıt altına alınmasının amacı nedir?", options: ["Rapor hazırlanması", "Malzeme kaydı", "Yük dengesini sağlamak", "Gerilim düşümü sağlamak"], answer: 0 },
+		  { question: "Elektrik tesislerinde bakım çalışmaları sırasında kullanılan işaretleme ne amaçla yapılır?", options: ["Estetik düzenleme için", "Bakım yerinin tespiti ve güvenlik için", "Malzeme kontrolü için", "Enerji tüketimini azaltmak için"], answer: 1 },
+		  { question: "Yüksek gerilim hücrelerinde yapılan izolasyon testi hangi gerilim aralığında yapılır?", options: ["10-50 V", "100-250 V", "500-1000 V", "1000-5000 V"], answer: 3 },
+		  { question: "Yalıtım testi sonucunda düşük direnç değeri neyi gösterir?", options: ["İzolasyonun sağlam olduğunu", "Devrenin kapalı olduğunu", "Yalıtımın zayıf olduğunu", "Akımın yüksek olduğunu"], answer: 2 },
+		  { question: "Topraklama baraları nerelerde bulunur?", options: ["Sadece trafo merkezlerinde", "Yalnızca yüksek gerilim hatlarında", "AG ve OG panolarında", "Sadece bina girişinde"], answer: 2 },
+		  { question: "Elektrik tesislerinde yapılan bakım faaliyetlerinin mevzuata uygunluğunu kim denetler?", options: ["Bakım ekibi lideri", "Şantiye şefi", "İşveren temsilcisi", "Yetkili teknik sorumlu ve/veya EPDK, TEDAŞ gibi kuruluşlar"], answer: 3 },
+		  { question: "Kompanzasyon sistemlerinde kontaktör arızaları genellikle neye bağlıdır?", options: ["Topraklamaya", "Fan arızasına", "Ark oluşumu ve sık anahtarlamaya", "LED aydınlatmaya"], answer: 2 },
+		  { question: "Gerilim yükselme arızaları aşağıdaki ekipmanlardan hangisinde daha çok gözlenir?", options: ["Kontaktör", "Kompanzasyon kondansatörü", "Sigorta", "Röle"], answer: 1 },
+		  { question: "Parafudr bakımı yapılırken en çok dikkat edilmesi gereken unsur nedir?", options: ["Renk kodu", "Etiket bilgisi", "Toprak bağlantısının sağlamlığı", "Boyutları"], answer: 2 },
+		  { question: "Bakım esnasında termal kamera ile yapılan tespitte sıcaklık artışı gözleniyorsa ne yapılmalıdır?", options: ["Ekipman boyanmalıdır", "Fan takılmalıdır", "Bağlantılar sıkılmalı ve kontrol edilmelidir", "Röle değiştirilmelidir"], answer: 2 },
+		  { question: "Kompanzasyon sisteminde bulunan kondansatörlerin görevini en iyi tanımlayan ifade aşağıdakilerden hangisidir?", options: ["Gerilim üretir", "Faz kaydırır ve reaktif gücü telafi eder", "Sigortayı açar", "Isı üretir"], answer: 1 },
+		  { question: "AG panolarda baraların yerleşimi bakım açısından neden önemlidir?", options: ["Estetik görünüm sağlar", "Etiketleme kolaylığı için", "Aşırı ısınma ve ark riskini azaltmak için", "Kablo seçiminde yardımcı olmak için"], answer: 2 },
+		  { question: "Yalıtkanlık testinde 500 V’luk gerilim ile yapılan ölçüm hangi durumlar için yeterlidir?", options: ["Yüksek gerilim şalt cihazları", "OG pano testleri", "AG pano ve kablo testleri", "Trafo testleri"], answer: 2 },
+		  { question: "Bakım sonrası testlerin kayıt altına alınması gereken belge aşağıdakilerden hangisidir?", options: ["Sigorta kataloğu", "Koruma rölesi etiketi", "Bakım tutanağı", "Enerji dengeleme raporu"], answer: 2 },
+		  { question: "Gerilim altında çalışma yapılacaksa personelin hangi belgelere sahip olması gerekir?", options: ["Sadece sigorta kartı", "İSG eğitimi ve özel eğitim sertifikaları", "Ehliyet", "Üretici firma izni"], answer: 1 },
+		  { question: "AG ve OG sistemlerinde bakım faaliyetleri neye göre planlanmalıdır?", options: ["Personelin isteğine", "İklim koşullarına", "İlgili standart ve teknik dokümanlara", "Fatura dönemine"], answer: 2 },
+		  { question: "Termal analiz sonuçlarında sıcaklık artışının sürekli gözlenmesi neyin göstergesidir?", options: ["Normal çalışma durumu", "Verimli çalışmanın", "Bağlantı sorunu veya temas direnci oluştuğunun", "Röle kontrolünün"], answer: 2 },
+		  { question: "Kompanzasyon sisteminde kondansatör patlamalarının en olası sebebi nedir?", options: ["Düşük sıcaklık", "Aşırı yüklenme ve uygun olmayan montaj", "Fan eksikliği", "Etiket eksikliği"], answer: 1 },
+		  { question: "Enerji analizörleri bakım sırasında hangi parametreleri göstermez?", options: ["Gerilim", "Akım", "Toprak direnci", "Harmonik"], answer: 2 },
+		  { question: "Topraklama ölçümünde düşük direnç değeri neyi ifade eder?", options: ["İzolasyon kaybı", "İyi topraklama", "Gerilim kaçağı", "Faz sırası hatası"], answer: 1 },
+		  { question: "Transformatörlerde sıcaklık kontrolü hangi cihaz ile yapılır?", options: ["Termometre", "Buchholz rölesi", "Termal kamera", "Basınç rölesi"], answer: 2 },
+		  { question: "Gerilim altında bakım yapılması gereken durumlarda hangi güvenlik prosedürü uygulanmalıdır?", options: ["Topraklama iptal edilir", "Çalışma sahası izole edilir ve özel PPE kullanılır", "Enerji artırılır", "Sadece gözlem yapılır"], answer: 1 },
+		  { question: "Termal kamera ile yapılan ölçümlerde ısınan noktalar hangi risklere işaret eder?", options: ["İyi yalıtkanlık", "Düşük gerilim", "Gevşek bağlantı ve temas direnci", "Toprak kısa devresi"], answer: 2 },
+		  { question: "OG hücrelerde bakım sırasında hangi testin yapılması önerilir?", options: ["İzolatör temizliği", "Yalıtım testi (megger)", "Zemin testleri", "Sıcaklık kontrolü"], answer: 1 },
+		  { question: "Kontaktörlerdeki aşırı ısınma genellikle hangi durumdan kaynaklanır?", options: ["Doğru bağlantı", "Fan eksikliği", "Sık açma kapama ve gevşek bağlantı", "Etiket yıpranması"], answer: 2 },
+		  { question: "Elektrik tesislerinde bakım sırasında en önemli belge aşağıdakilerden hangisidir?", options: ["Fatura", "Etiket çizimi", "Bakım planı ve tutanağı", "Sigorta bedeli"], answer: 2 },
+		  { question: "Aşırı harmonik oluşumu aşağıdakilerden hangisine zarar verir?", options: ["İzolatör", "Topraklama", "Elektronik ekipmanlar ve ölçüm cihazları", "İzole halı"], answer: 2 },
+		  { question: "İşletmelerde kompanzasyon sistemlerinin sağlıklı çalışması için ne yapılmalıdır?", options: ["Sigorta değeri artırılır", "Kondansatörler devre dışı bırakılır", "Periyodik bakım yapılmalı ve analizörlerle izlenmelidir", "Sistem kapatılır"], answer: 2 },
+		  { question: "Transformatör yağında partikül gözlemlenmesi neyin göstergesidir?", options: ["Temiz çalışma", "İyi yalıtım", "Kirlenme ve içsel bozulma riski", "Enerji fazlalığı"], answer: 2 },
+		  { question: "Yıldırımdan korunma sisteminde paratoner bağlantıları neden kontrol edilmelidir?", options: ["Estetik amaçlı", "Topraklama devamlılığı için", "Etiket yerleşimi için", "Kablo uzunluğu tespiti için"], answer: 1 },
+		  { question: "Elektrik panolarında yapılan temizlik işlemleri hangi sıklıkta yapılmalıdır?", options: ["Yılda bir", "Haftada bir", "Arıza sonrası", "Periyodik bakım planına göre"], answer: 3 },
+		  { question: "Termal görüntülemede sıcaklık eşik değerlerinin aşılması neyle sonuçlanabilir?", options: ["Soğuma", "Arıza ve yangın riski", "Etiket bozulması", "Ses artışı"], answer: 1 },
+		  { question: "Elektriksel ekipmanlarda gevşek bağlantılar neye yol açar?", options: ["Gerilim artışı", "Topraklama kaybı", "Isınma ve ark oluşumu", "Sigorta dayanımı"], answer: 2 },
+		  { question: "SCADA sisteminde bakım takibi yapılırken hangi bilgi kritik değildir?", options: ["Bakım zamanı", "Personel kimliği", "Ekipman türü", "Kullanılan boya markası"], answer: 3 },
+		  { question: "Parafudr değişimi sırasında en önemli husus nedir?", options: ["Etiketin sağlamlığı", "Toprak hattına bağlantının doğru yapılması", "Renk uyumu", "Boyut kontrolü"], answer: 1 },
+		  { question: "Toprak direnci ölçümleri hangi hava koşullarında daha sağlıklıdır?", options: ["Şiddetli yağmurda", "Kurak havada", "Toprak nemliyken", "Karlı zeminde"], answer: 2 },
+		  { question: "Enerji analizörü ile ölçüm yaparken dikkat edilmesi gereken ilk şey nedir?", options: ["Yüksek gerilim kullanımı", "Bağlantı yönlerinin doğruluğu", "Etiket kontrolü", "Renk kodu"], answer: 1 },
+		  { question: "Kompanzasyon sisteminde aşırı kapasitif güç gözlenirse çözüm nedir?", options: ["Reaktör ilavesi", "Kapasitör sayısını artırmak", "Anahtarlamayı kaldırmak", "Şalteri değiştirmek"], answer: 0 },
+		  { question: "İzolasyon testi sonucu çok düşükse ilk yapılması gereken nedir?", options: ["Gerilim verilmesi", "Toprak hattının ayrılması", "Arızalı ekipmanın devreden çıkarılması", "Sigorta yükseltilmesi"], answer: 2 },
+		  { question: "Bakım sonrası sistemin tekrar devreye alınmasında hangi kontrol zorunludur?", options: ["Etiket kontrolü", "Yük testi", "Gerilim testi ve bağlantı kontrolü", "Fiziki temizlik"], answer: 2 },
+		  { question: "Termal analizde kullanılan cihaz aşağıdakilerden hangisidir?", options: ["Megger", "Analizör", "Isı kamerası", "Kumpas"], answer: 2 },
+		  { question: "Elektriksel bakımda en çok kazaya neden olan faktör aşağıdakilerden hangisidir?", options: ["Yetersiz etiketleme", "Yetersiz eğitim ve dikkatsizlik", "Bakım planının olmaması", "Yüksek gerilim"], answer: 1 },
+		  { question: "Topraklama sisteminin sürekliliğini kontrol etmek için hangi ölçüm yapılır?", options: ["Gerilim ölçümü", "Toprak geçiş direnci ölçümü", "Akım yönü ölçümü", "Yalıtım testi"], answer: 1 },
+		  { question: "Trafo bakımında kullanılan Buchholz rölesi neyi tespit eder?", options: ["Gerilim dengesini", "Yağ seviyesi", "Gaz birikmesi ve iç arıza", "Toprak kaçağı"], answer: 2 },
+		  { question: "Yüksek sıcaklık farkı gözlenen bağlantılarda ilk yapılması gereken nedir?", options: ["Etiketleme", "Soğutma fanı eklemek", "Bağlantıyı sıkmak ve temizlemek", "Sigorta değiştirmek"], answer: 2 },
+		  { question: "Bakım ekibi çalışmaya başlamadan önce mutlaka ne yapmalıdır?", options: ["Enerjiyi kesmek ve kilitlemek", "Sigorta seçimi yapmak", "Trafoyu test etmek", "Etiket kontrolü yapmak"], answer: 0 },
+		  { question: "Elektrik panosu temizliğinde en uygun araç hangisidir?", options: ["Islak bez", "Komresörlü hava ve fırça", "Yağ çözücü kimyasal", "Tinerli bez"], answer: 1 },
+		  { question: "Kontaktör bobinlerinin arızalanma sebeplerinden biri aşağıdakilerden hangisidir?", options: ["Yüksek sıcaklık", "Gevşek vida", "Yanlış renk kodu", "Kablo tipi"], answer: 0 },
+		  { question: "AG sistemde kompanzasyon devre dışı kalırsa ne olur?", options: ["Enerji kesilir", "Sistemde reaktif güç artar ve ceza oluşur", "Sigorta patlar", "Sistem hızlanır"], answer: 1 },
+		  { question: "Yüksek gerilim odasına girişte öncelikle ne kontrol edilmelidir?", options: ["Lamba çalışıyor mu", "Etiketler okunuyor mu", "Gerilim olup olmadığı", "Pano boyası"], answer: 2 },
+		  { question: "Yalıtım testi yapılırken ölçüm değeri kısa sürede düşüyorsa bu ne anlama gelir?", options: ["Yalıtım sağlamdır", "Yalıtım zayıftır ve kaçak olabilir", "Topraklama çok iyidir", "Gerilim yüksektir"], answer: 1 },
+		  { question: "Bakım işlemi sırasında enerji kesildiğinde ne yapılmalıdır?", options: ["Çalışmaya devam edilir", "Sisteme hemen enerji verilir", "Kilitli kalma prosedürü uygulanır ve tekrar güvenlik kontrolü yapılır", "Bakım iptal edilir"], answer: 2 },
+		  { question: "Topraklama sisteminde ölçüm sonucu sınır değerin üstünde çıkarsa ne yapılır?", options: ["Etiketlenir", "Rapor yazılır ve sistem kullanılmaya devam edilir", "Topraklama sistemi geliştirilir", "Sigorta artırılır"], answer: 2 },
+		  { question: "Elektriksel ekipmanlara yapılacak bakımda PPE ekipmanına örnek değildir?", options: ["İzole eldiven", "İzole ayakkabı", "Kask", "Reflektör yelek"], answer: 3 },
+		  { question: "Gerilim altında yapılan çalışmalarda aşağıdakilerden hangisi yasaktır?", options: ["İzole eldiven kullanımı", "Gerilim dedektörü ile kontrol", "Koruyucu gözlük takılması", "İletken parça ile temas"], answer: 3 },
+		  { question: "Transformatörün nominal gücü bakım periyodunu etkiler mi?", options: ["Hayır, sadece yıllık takvim etkiler", "Evet, daha büyük güçte daha sık kontrol gerekir", "Sadece OG sistemlerde etkiler", "Trafo tipine göre değişir"], answer: 1 },
+		  { question: "Yalıtım testi yapılırken test süresi kısa tutulursa ne olur?", options: ["Sonuç daha güvenilir olur", "Etkisi artar", "Sonuç yanıltıcı olabilir", "Gerilim artar"], answer: 2 },
+		  { question: "Elektrik ekipmanlarının periyodik bakımı neden gereklidir?", options: ["İş güvenliği ve sistem verimliliği için", "Etiket güncellemesi için", "Enerji fiyatı sabitliği için", "Sadece raporlama için"], answer: 0 },
+		  { question: "Kompanzasyon sisteminde kontaktör aşırı ısınıyorsa önlem nedir?", options: ["Kontaktör değiştirilir ve bağlantılar kontrol edilir", "Sigorta yükseltilir", "Etiket yenilenir", "Trafo değiştirilir"], answer: 0 },
+		  { question: "Topraklama tesisatı bağlantılarında gevşeklik neden sorun oluşturur?", options: ["Enerji iletimi artar", "Toprak geçiş direnci artar ve güvenlik riski oluşur", "Kablo kopmaz", "İzolasyon artar"], answer: 1 },
+		  { question: "Termal kamera ile ölçümde sıcaklık farkı tespit edilirse ilk yapılacak işlem nedir?", options: ["Enerji artırılır", "Bağlantılar sıkılır ve yeniden ölçüm yapılır", "Sigorta atılır", "Fan konur"], answer: 1 },
+		];
+
+        let currentQuestion = 0;
+        let score = 0;
+        const questionEl = document.getElementById("question");
+        const optionsEl = document.getElementById("options");
+        const resultEl = document.getElementById("result");
+        const nextBtn = document.getElementById("nextBtn");
+        const scoreBox = document.getElementById("scoreBox");
+
+        function loadQuestion() {
+            const allNavItems = document.querySelectorAll('#questionList li');
+            allNavItems.forEach((item, idx) => {
+                item.classList.remove('active');
+                if (idx === currentQuestion) {
+                    item.classList.add('active');
+                }
+            });
+
+            const questionList = document.getElementById("questionList");
+            if (questionList && questionList.children.length === 0) {
+                questions.forEach((q, i) => {
+                    const li = document.createElement("li");
+                    li.textContent = `Soru ${i + 1}`;
+                    li.onclick = () => {
+                        currentQuestion = i;
+                        loadQuestion();
+                    };
+                    questionList.appendChild(li);
+                });
+            }
+
+            const q = questions[currentQuestion];
+            questionEl.textContent = `Soru ${currentQuestion + 1}: ${q.question}`;
+            optionsEl.innerHTML = "";
+            resultEl.textContent = "";
+            nextBtn.style.display = "none";
+            scoreBox.textContent = `Puan: ${score} / ${questions.length}`;
+
+            q.options.forEach((opt, index) => {
+                const li = document.createElement("li");
+                const btn = document.createElement("button");
+                btn.textContent = `${harfler[index]}) ${opt}`;
+                btn.onclick = () => checkAnswer(index, btn);
+                li.appendChild(btn);
+                optionsEl.appendChild(li);
+            });
+        }
+
+        function checkAnswer(selected, btnClicked) {
+            const q = questions[currentQuestion];
+            const buttons = document.querySelectorAll(".options button");
+
+            buttons.forEach((btn, idx) => {
+                btn.disabled = true;
+                btn.classList.remove("correct", "incorrect");
+                if (idx === q.answer) {
+                    btn.classList.add("correct");
+                }
+            });
+
+            if (selected === q.answer) {
+                score++;
+                resultEl.textContent = "Doğru cevap!";
+                resultEl.className = "result correct";
+            } else {
+                resultEl.textContent = "Yanlış cevap.";
+                resultEl.className = "result incorrect";
+                btnClicked.classList.add("incorrect");
+            }
+
+            nextBtn.style.display = "inline-block";
+            scoreBox.textContent = `Puan: ${score} / ${questions.length}`;
+        }
+
+        nextBtn.onclick = () => {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+            } else {
+                questionEl.textContent = "Test tamamlandı!";
+                optionsEl.innerHTML = "";
+                nextBtn.style.display = "none";
+                resultEl.textContent = `Tebrikler! ${score} / ${questions.length} doğru cevap verdiniz.`;
+                resultEl.className = "result correct";
+            }
+        };
+
+        loadQuestion();
+    </script>
+</body>
+
+</html>

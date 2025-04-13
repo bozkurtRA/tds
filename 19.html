@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>rA | Elektrik Dağıtım Şebekeleri Enerji Kabloları Montaj (Uygulama) Usul ve Esasları Testi</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(120deg, #f0f4f8, #d9e2ec);
+            margin: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-bottom: 20px;
+        }
+
+		.quiz-container {
+			background: #ffffff;
+			padding: 50px;
+			border-radius: 24px;
+			box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+			max-width: 100%;
+			width: 70%;  /* PC'de genişliği %70 yapıyoruz */
+			box-sizing: border-box;
+			margin: 20px;
+			margin-left: 20%;  /* Sol taraftan %10 boşluk bırakarak sağa kaydırıyoruz */
+		}
+
+        .question {
+            font-size: 24px;
+            margin-bottom: 30px;
+            font-weight: 600;
+            color: #102a43;
+            text-align: center;
+        }
+
+        .options {
+            list-style: none;
+            padding: 0;
+        }
+
+        .options li {
+            margin-bottom: 18px;
+        }
+
+        .options button {
+            width: 100%;
+            text-align: left;
+            background: #e3ebf6;
+            border: none;
+            border-radius: 10px;
+            padding: 16px 24px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        .options button:hover {
+            background: #c7d7ea;
+            transform: scale(1.01);
+        }
+
+        .options button.correct {
+            background-color: #38a169 !important;
+            color: white;
+            font-weight: bold;
+        }
+
+        .options button.incorrect {
+            background-color: #e53e3e !important;
+            color: white;
+            font-weight: bold;
+        }
+
+        .result {
+            margin-top: 30px;
+            font-weight: bold;
+            font-size: 20px;
+            text-align: center;
+        }
+
+        .result.correct {
+            color: green;
+        }
+
+        .result.incorrect {
+            color: red;
+        }
+
+        #nextBtn {
+            margin-top: 35px;
+            background: #2b6cb0;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: none;
+            float: right;
+        }
+
+        #nextBtn:hover {
+            background: #2c5282;
+        }
+
+        #scoreBox {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: #2b6cb0;
+        }
+
+        footer {
+            margin-top: 60px;
+            text-align: center;
+            font-size: 15px;
+            color: #555;
+        }
+
+		.question-navigation {
+			position: fixed;
+			left: 0;
+			top: 0;
+			bottom: 0;
+			width: 140px; /* Genişliği küçülttük */
+			overflow-y: auto;
+			background: #e2e8f0;
+			padding: 20px;
+			box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+			z-index: 1;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: flex-start;
+		}
+
+		.question-navigation a,
+		.question-navigation h3 {
+			text-align: center; /* Link ve başlıkları ortalar */
+			width: 100%;
+		}
+
+		.question-navigation a {
+			text-decoration: none;
+			font-size: 18px;
+			margin-bottom: 20px;
+			color: white;  /* Yazı rengini beyaz yapalım */
+			background-color: #38a169;  /* Yeşil arka plan rengi */
+			padding: 10px 20px;  /* Düğmeye biraz iç boşluk ekleyelim */
+			border-radius: 8px;  /* Kenarlarını yuvarlayalım */
+			font-weight: bold;
+			display: block;  /* Linkin tüm alanını tıklanabilir yapar */
+			text-align: center;  /* Yazıyı ortalar */
+			transition: background-color 0.3s ease;  /* Hover efekti eklerken yumuşak geçiş sağlar */
+		}
+
+		.question-navigation h3 {
+			font-size: 18px;
+			margin-bottom: 10px;
+		}
+
+        .question-navigation a:hover {
+            background-color: #2f855a;
+        }
+
+        .question-list {
+            padding-left: 20px;
+            font-size: 14px;
+            line-height: 1.6;
+            list-style: none;
+        }
+
+        .question-list li {
+            background: white;
+            padding: 6px 10px;
+            border-radius: 6px;
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            margin-bottom: 6px;
+        }
+
+        .question-list li.active {
+            font-weight: bold;
+            color: #2b6cb0;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+                overflow-y: auto;
+                align-items: flex-start;
+                padding: 20px;
+            }
+
+            .quiz-container {
+                margin-left: 0 !important;
+                margin-top: 20px;
+                padding: 24px;
+                width: 100%;
+                max-width: 100%;
+            }
+
+			.question-navigation {
+				position: static;
+				width: 100%;  /* Mobil görünümde genişlik %100 olacak */
+				box-shadow: none;
+				margin-bottom: 20px;
+				padding: 10px;
+				margin-top: 10px;
+			}
+
+            .question-navigation a {
+                width: auto;
+                padding: 8px 16px;
+                font-size: 16px;
+            }
+
+            .question-list {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 6px;
+                padding-left: 0;
+                justify-content: center;
+            }
+
+            .question-list li {
+                flex: 0 0 auto;
+                font-size: 14px;
+                padding: 6px 10px;
+                border-radius: 6px;
+                box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+                cursor: pointer;
+            }
+
+            .question-list li.active {
+                font-weight: bold;
+                color: #2b6cb0;
+            }
+
+            .question {
+                font-size: 20px;
+            }
+
+            .options button {
+                font-size: 16px;
+                padding: 12px 18px;
+            }
+
+            #nextBtn {
+                float: none;
+                display: block;
+                margin: 30px auto 0 auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .question-navigation {
+                width: 100%;
+                padding: 8px;
+            }
+
+            .question-navigation a {
+                font-size: 14px;
+                padding: 8px 12px;
+            }
+
+            .options button {
+                font-size: 14px;
+                padding: 12px;
+            }
+
+            .question {
+                font-size: 18px;
+            }
+
+            #nextBtn {
+                padding: 12px 24px;
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="question-navigation">
+        <a href="index.html">Ana Sayfa</a>
+        <h3>Tüm Sorular</h3>
+        <ol id="questionList" class="question-list"></ol>
+    </div>
+
+    <div class="quiz-container">
+        <div id="quiz">
+            <div class="question" id="question"></div>
+            <ul class="options" id="options"></ul>
+            <button id="nextBtn" type="button">Sonraki Soru</button>
+            <div class="result" id="result"></div>
+            <div id="scoreBox"></div>
+        </div>
+        <footer>
+            Bu test <strong>Elektrik Dağıtım Şebekeleri Enerji Kabloları Montaj (Uygulama) Usul ve Esasları</strong> temel alınarak hazırlanmıştır.<br />
+            [ ramazan.bozkurt@tedas.gov.tr ]
+        </footer>
+    </div>
+
+    <script>
+        const harfler = ["A", "B", "C", "D"];
+		const questions = [
+		  { question: "Kazıya başlamadan önce kanal güzergahının ve kanal boyutlarının tayininde aşağıdakilerden hangisi yapılmalıdır?", options: ["Belediyeye bildirimde bulunulmalıdır", "Kazı doğrudan başlatılabilir", "Kontrol elemanı ile mutabakat sağlanmalıdır", "Sadece yüklenici onayı yeterlidir"], answer: 2 },
+		  { question: "Kablolarda uygulanacak minimum kıvrılma yarıçapı, üç damarlı XLPE ve PVC yalıtkanlı Y.G. kablolar için aşağıdakilerden hangisidir?", options: ["10 x D", "12 x D", "15 x D", "18 x D"], answer: 2 },
+		  { question: "PVC ikaz bandı, kablo üzerindeki koruyucu tuğla veya betonun ne kadar üzerine serilmelidir?", options: ["10 cm", "15 cm", "20 cm", "25 cm"], answer: 2 },
+		  { question: "Kabloların döşeneceği kanalın standart derinliği ve dip genişliği aşağıdakilerden hangisidir?", options: ["80 cm derinlik, 40 cm dip genişlik", "60 cm derinlik, 40 cm dip genişlik", "80 cm derinlik, 60 cm dip genişlik", "100 cm derinlik, 50 cm dip genişlik"], answer: 0 },
+		  { question: "Metal borular, tek damarlı kablolar için hangi şartla kullanılabilir?", options: ["Hiçbir şart yoktur", "Her zaman kullanılabilir", "Yalnızca antimagnetik metal borular kullanılabilir", "Sadece PVC kılıflıysa kullanılabilir"], answer: 2 },
+		  { question: "Kablonun borudan geçirilmesi sırasında kaymayı kolaylaştırmak için hangi malzeme kullanılabilir?", options: ["Tiner", "Benzin", "Alkalisiz sabun", "Asit bazlı temizleyici"], answer: 2 },
+		  { question: "İkaz bandı üzerine yazılacak olan uyarı metni aşağıdakilerden hangisidir?", options: ["DİKKAT KABLO", "YÜKSEK GERİLİM HATTI", "ÖLÜM TEHLİKESİ TEDAŞ YG I ENERJİ KABLOSU", "TEHLİKELİ MADDE"], answer: 2 },
+		  { question: "Kabloların döşenmesinde, aynı fazların yan yana getirilmemesi gerekliliği aşağıdaki seçeneklerden hangisinde doğru verilmiştir?", options: ["L1 L1 L1 - L2 L2 L2 - L3 L3 L3", "L1 L2 L3 - L3 L2 L1", "L1 L1 L2 - L3 L3 L2", "L1 L2 L3 - L1 L2 L3"], answer: 1 },
+		  { question: "Beton koruyucu bloklar için öngörülen minimum boyutlardan biri aşağıdakilerden hangisidir?", options: ["10x20x3 cm", "20x50x6 cm", "25x60x7 cm", "15x45x5 cm"], answer: 1 },
+		  { question: "Kablo çekimi sırasında vincin çekim gücü ile ilgili hangisi doğrudur?", options: ["Elle ayarlanmalıdır", "Otomatik ayarla kontrol edilmesi tercih edilir", "Çekim gücü önem arz etmez", "İlk başta maksimum değere ayarlanmalıdır"], answer: 1 },
+		  { question: "Kazı sırasında çıkan toprak ve moloz ne yapılmalıdır?", options: ["Olduğu yere bırakılır", "Yüklenici tarafından korunur ve gerektiğinde kullanılır", "İş makineleriyle yakındaki alana serilir", "Kullanılmasa da kazı alanında bırakılır"], answer: 1 },
+		  { question: "Yatay sondajla yapılan geçişlerde aşağıdaki elemanlardan hangisi kullanılmaz?", options: ["Çelik boru", "Kum", "Koruyucu eleman", "İkaz bandı"], answer: 1 },
+		  { question: "Kablo döşemesi sırasında çevre sıcaklığı kaç °C’nin altında ise döşeme yapılamaz?", options: ["+0°C", "+5°C", "+10°C", "+15°C"], answer: 1 },
+		  { question: "Kablo kanalına serilen tuğlaların uygunluğu için hangi belge esas alınır?", options: ["TS 802", "TS 771-1", "TS EN 206-1", "TS 500"], answer: 1 },
+		  { question: "Kablonun dış çapı 8 cm ise, aynı kanalda döşenecek kablolar arası mesafe minimum ne olmalıdır?", options: ["7 cm", "8 cm", "10 cm", "12 cm"], answer: 1 },
+		  { question: "Enerji kablosu güzergahında her kaç metrede bir işaret plakası yerleştirilmelidir?", options: ["20 m", "30 m", "50 m", "100 m"], answer: 2 },
+		  { question: "Topraklama iletkeni serimi amacıyla açılan kanalın minimum ebatı nedir?", options: ["10x10 cm", "20x20 cm", "30x30 cm", "40x40 cm"], answer: 1 },
+		  { question: "Kablolar kanal boyunca hangi şekilde döşenmelidir?", options: ["Üst üste", "Gelişigüzel", "Zorunlu olmadıkça üst üste gelmeyecek şekilde", "Yalnızca aynı fazlar bir arada olacak şekilde"], answer: 2 },
+		  { question: "Beton blokların basınç dayanımı minimum ne kadar olmalıdır?", options: ["2 N/mm²", "3 N/mm²", "5 N/mm²", "10 N/mm²"], answer: 2 },
+		  { question: "Kablo ile kanal duvarı arasında bırakılması gereken minimum mesafe nedir (kablo çapı 6 cm ise)?", options: ["3 cm", "5 cm", "7 cm", "9 cm"], answer: 2 },
+		  { question: "Kazıya başlamadan önce kanal güzergahının ve kanal boyutlarının tayininde aşağıdakilerden hangisi yapılmalıdır?", options: ["Belediyeye bildirimde bulunulmalıdır", "Kazı doğrudan başlatılabilir", "Kontrol elemanı ile mutabakat sağlanmalıdır", "Sadece yüklenici onayı yeterlidir"], answer: 2 },
+		  { question: "Kablolarda uygulanacak minimum kıvrılma yarıçapı, üç damarlı XLPE ve PVC yalıtkanlı Y.G. kablolar için aşağıdakilerden hangisidir?", options: ["10 x D", "12 x D", "15 x D", "18 x D"], answer: 2 },
+		  { question: "PVC ikaz bandı, kablo üzerindeki koruyucu tuğla veya betonun ne kadar üzerine serilmelidir?", options: ["10 cm", "15 cm", "20 cm", "25 cm"], answer: 2 },
+		  { question: "Kabloların döşeneceği kanalın standart derinliği ve dip genişliği aşağıdakilerden hangisidir?", options: ["80 cm derinlik, 40 cm dip genişlik", "60 cm derinlik, 40 cm dip genişlik", "80 cm derinlik, 60 cm dip genişlik", "100 cm derinlik, 50 cm dip genişlik"], answer: 0 },
+		  { question: "Metal borular, tek damarlı kablolar için hangi şartla kullanılabilir?", options: ["Hiçbir şart yoktur", "Her zaman kullanılabilir", "Yalnızca antimagnetik metal borular kullanılabilir", "Sadece PVC kılıflıysa kullanılabilir"], answer: 2 },
+		  { question: "Kablonun borudan geçirilmesi sırasında kaymayı kolaylaştırmak için hangi malzeme kullanılabilir?", options: ["Tiner", "Benzin", "Alkalisiz sabun", "Asit bazlı temizleyici"], answer: 2 },
+		  { question: "İkaz bandı üzerine yazılacak olan uyarı metni aşağıdakilerden hangisidir?", options: ["DİKKAT KABLO", "YÜKSEK GERİLİM HATTI", "ÖLÜM TEHLİKESİ TEDAŞ YG I ENERJİ KABLOSU", "TEHLİKELİ MADDE"], answer: 2 },
+		  { question: "Kabloların döşenmesinde, aynı fazların yan yana getirilmemesi gerekliliği aşağıdaki seçeneklerden hangisinde doğru verilmiştir?", options: ["L1 L1 L1 - L2 L2 L2 - L3 L3 L3", "L1 L2 L3 - L3 L2 L1", "L1 L1 L2 - L3 L3 L2", "L1 L2 L3 - L1 L2 L3"], answer: 1 },
+		  { question: "Beton koruyucu bloklar için öngörülen minimum boyutlardan biri aşağıdakilerden hangisidir?", options: ["10x20x3 cm", "20x50x6 cm", "25x60x7 cm", "15x45x5 cm"], answer: 1 },
+		  { question: "Kablo çekimi sırasında vincin çekim gücü ile ilgili hangisi doğrudur?", options: ["Elle ayarlanmalıdır", "Otomatik ayarla kontrol edilmesi tercih edilir", "Çekim gücü önem arz etmez", "İlk başta maksimum değere ayarlanmalıdır"], answer: 1 },
+		  { question: "Kazı sırasında çıkan toprak ve moloz ne yapılmalıdır?", options: ["Olduğu yere bırakılır", "Yüklenici tarafından korunur ve gerektiğinde kullanılır", "İş makineleriyle yakındaki alana serilir", "Kullanılmasa da kazı alanında bırakılır"], answer: 1 },
+		  { question: "Yatay sondajla yapılan geçişlerde aşağıdaki elemanlardan hangisi kullanılmaz?", options: ["Çelik boru", "Kum", "Koruyucu eleman", "İkaz bandı"], answer: 3 },
+		  { question: "Kablo döşemesi sırasında çevre sıcaklığı kaç °C’nin altında ise döşeme yapılamaz?", options: ["+0°C", "+5°C", "+10°C", "+15°C"], answer: 1 },
+		  { question: "Kablo kanalına serilen tuğlaların uygunluğu için hangi belge esas alınır?", options: ["TS 802", "TS 771-1", "TS EN 206-1", "TS 500"], answer: 1 },
+		  { question: "Kablonun dış çapı 8 cm ise, aynı kanalda döşenecek kablolar arası mesafe minimum ne olmalıdır?", options: ["7 cm", "8 cm", "10 cm", "12 cm"], answer: 1 },
+		  { question: "Enerji kablosu güzergahında her kaç metrede bir işaret plakası yerleştirilmelidir?", options: ["20 m", "30 m", "50 m", "100 m"], answer: 2 },
+		  { question: "Topraklama iletkeni serimi amacıyla açılan kanalın minimum ebatı nedir?", options: ["10x10 cm", "20x20 cm", "30x30 cm", "40x40 cm"], answer: 1 },
+		  { question: "Kablolar kanal boyunca hangi şekilde döşenmelidir?", options: ["Üst üste", "Gelişigüzel", "Zorunlu olmadıkça üst üste gelmeyecek şekilde", "Yalnızca aynı fazlar bir arada olacak şekilde"], answer: 2 },
+		  { question: "Beton blokların basınç dayanımı minimum ne kadar olmalıdır?", options: ["2 N/mm²", "3 N/mm²", "5 N/mm²", "10 N/mm²"], answer: 2 },
+		  { question: "Kablo ile kanal duvarı arasında bırakılması gereken minimum mesafe nedir (kablo çapı 6 cm ise)?", options: ["3 cm", "5 cm", "7 cm", "9 cm"], answer: 2 },
+		  { question: "Çok damarlı kabloların çelik boru içerisinden geçirilmesinde boru çapı, dış çapın en az kaç katı olmalıdır?", options: ["1.5 katı", "2 katı", "2.5 katı", "3 katı"], answer: 1 },
+		  { question: "Kablo döşemesinde kablonun kıvrılma yarıçapı belirlenirken dikkate alınan 'D' harfi neyi temsil eder?", options: ["Kablo uzunluğu", "Kablo kütlesi", "Kablo dış çapı", "Kablo direnci"], answer: 2 },
+		  { question: "Kabloların döşendiği kanalın dibi neyle sıkıştırılmalıdır?", options: ["Ayakla bastırılarak", "El kompaktörü ile", "Silindir vs. ile", "Betonla dökülerek"], answer: 2 },
+		  { question: "Kablolar makaradan açılırken aşağıdaki uygulamalardan hangisi kesinlikle yapılmamalıdır?", options: ["Makara döndürülerek açılmalıdır", "Makara yatırılarak açılmamalıdır", "Makara sürüklenerek açılabilir", "Makara dik konumda olmalıdır"], answer: 2 },
+		  { question: "Kablo başlıkları ile ilgili aşağıdakilerden hangisi doğrudur?", options: ["Oynamayacak şekilde bağlanmalıdır", "Her zaman izole edilmelidir", "Sadece iç mekanda kullanılır", "Beton ile kaplanmalıdır"], answer: 0 },
+		  { question: "Direğe veya duvara döşenen kablolar için kablolar arası minimum mesafe ne olmalıdır?", options: ["2 cm", "Kablo çapı kadar", "5 cm", "1 cm"], answer: 1 },
+		  { question: "Aynı kanal içine AG ve OG kablosu birlikte döşeniyorsa aralarına ne konulmalıdır?", options: ["Metal levha", "Koruyucu eleman", "Çimento dolgu", "Plastik seperatör"], answer: 1 },
+		  { question: "Kablo ek yerlerinde ne tür bir şekil verilerek kabloya pay bırakılmalıdır?", options: ["U şekli", "L şekli", "S şekli", "Z şekli"], answer: 2 },
+		  { question: "Kablo ek yerlerinin mufları nereye alınmalıdır?", options: ["Toprağa gömülmelidir", "Rögar içine alınmalıdır", "Açıkta bırakılmalıdır", "Beton içine gömülmelidir"], answer: 1 },
+		  { question: "Birden fazla kablo sisteminde faz dizilimi aşağıdakilerden hangisiyle doğru verilmiştir?", options: ["L1 L1 L1 - L2 L2 L2 - L3 L3 L3", "L1 L2 L3 - L3 L2 L1", "L1 L2 L3 - L1 L2 L3", "L1 L2 L3 - L2 L3 L1"], answer: 2 },
+		];
+
+        let currentQuestion = 0;
+        let score = 0;
+        const questionEl = document.getElementById("question");
+        const optionsEl = document.getElementById("options");
+        const resultEl = document.getElementById("result");
+        const nextBtn = document.getElementById("nextBtn");
+        const scoreBox = document.getElementById("scoreBox");
+
+        function loadQuestion() {
+            const allNavItems = document.querySelectorAll('#questionList li');
+            allNavItems.forEach((item, idx) => {
+                item.classList.remove('active');
+                if (idx === currentQuestion) {
+                    item.classList.add('active');
+                }
+            });
+
+            const questionList = document.getElementById("questionList");
+            if (questionList && questionList.children.length === 0) {
+                questions.forEach((q, i) => {
+                    const li = document.createElement("li");
+                    li.textContent = `Soru ${i + 1}`;
+                    li.onclick = () => {
+                        currentQuestion = i;
+                        loadQuestion();
+                    };
+                    questionList.appendChild(li);
+                });
+            }
+
+            const q = questions[currentQuestion];
+            questionEl.textContent = `Soru ${currentQuestion + 1}: ${q.question}`;
+            optionsEl.innerHTML = "";
+            resultEl.textContent = "";
+            nextBtn.style.display = "none";
+            scoreBox.textContent = `Puan: ${score} / ${questions.length}`;
+
+            q.options.forEach((opt, index) => {
+                const li = document.createElement("li");
+                const btn = document.createElement("button");
+                btn.textContent = `${harfler[index]}) ${opt}`;
+                btn.onclick = () => checkAnswer(index, btn);
+                li.appendChild(btn);
+                optionsEl.appendChild(li);
+            });
+        }
+
+        function checkAnswer(selected, btnClicked) {
+            const q = questions[currentQuestion];
+            const buttons = document.querySelectorAll(".options button");
+
+            buttons.forEach((btn, idx) => {
+                btn.disabled = true;
+                btn.classList.remove("correct", "incorrect");
+                if (idx === q.answer) {
+                    btn.classList.add("correct");
+                }
+            });
+
+            if (selected === q.answer) {
+                score++;
+                resultEl.textContent = "Doğru cevap!";
+                resultEl.className = "result correct";
+            } else {
+                resultEl.textContent = "Yanlış cevap.";
+                resultEl.className = "result incorrect";
+                btnClicked.classList.add("incorrect");
+            }
+
+            nextBtn.style.display = "inline-block";
+            scoreBox.textContent = `Puan: ${score} / ${questions.length}`;
+        }
+
+        nextBtn.onclick = () => {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+            } else {
+                questionEl.textContent = "Test tamamlandı!";
+                optionsEl.innerHTML = "";
+                nextBtn.style.display = "none";
+                resultEl.textContent = `Tebrikler! ${score} / ${questions.length} doğru cevap verdiniz.`;
+                resultEl.className = "result correct";
+            }
+        };
+
+        loadQuestion();
+    </script>
+</body>
+
+</html>

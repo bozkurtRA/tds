@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>rA | Elektrik Piyasasında Dağıtım ve Perakende Satış Faaliyetlerine İlişkin Kalite Yönetmeliği Testi</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(120deg, #f0f4f8, #d9e2ec);
+            margin: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-bottom: 20px;
+        }
+
+		.quiz-container {
+			background: #ffffff;
+			padding: 50px;
+			border-radius: 24px;
+			box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+			max-width: 100%;
+			width: 70%;  /* PC'de genişliği %70 yapıyoruz */
+			box-sizing: border-box;
+			margin: 20px;
+			margin-left: 20%;  /* Sol taraftan %10 boşluk bırakarak sağa kaydırıyoruz */
+		}
+
+        .question {
+            font-size: 24px;
+            margin-bottom: 30px;
+            font-weight: 600;
+            color: #102a43;
+            text-align: center;
+        }
+
+        .options {
+            list-style: none;
+            padding: 0;
+        }
+
+        .options li {
+            margin-bottom: 18px;
+        }
+
+        .options button {
+            width: 100%;
+            text-align: left;
+            background: #e3ebf6;
+            border: none;
+            border-radius: 10px;
+            padding: 16px 24px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        .options button:hover {
+            background: #c7d7ea;
+            transform: scale(1.01);
+        }
+
+        .options button.correct {
+            background-color: #38a169 !important;
+            color: white;
+            font-weight: bold;
+        }
+
+        .options button.incorrect {
+            background-color: #e53e3e !important;
+            color: white;
+            font-weight: bold;
+        }
+
+        .result {
+            margin-top: 30px;
+            font-weight: bold;
+            font-size: 20px;
+            text-align: center;
+        }
+
+        .result.correct {
+            color: green;
+        }
+
+        .result.incorrect {
+            color: red;
+        }
+
+        #nextBtn {
+            margin-top: 35px;
+            background: #2b6cb0;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: none;
+            float: right;
+        }
+
+        #nextBtn:hover {
+            background: #2c5282;
+        }
+
+        #scoreBox {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: #2b6cb0;
+        }
+
+        footer {
+            margin-top: 60px;
+            text-align: center;
+            font-size: 15px;
+            color: #555;
+        }
+
+		.question-navigation {
+			position: fixed;
+			left: 0;
+			top: 0;
+			bottom: 0;
+			width: 140px; /* Genişliği küçülttük */
+			overflow-y: auto;
+			background: #e2e8f0;
+			padding: 20px;
+			box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+			z-index: 1;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: flex-start;
+		}
+
+		.question-navigation a,
+		.question-navigation h3 {
+			text-align: center; /* Link ve başlıkları ortalar */
+			width: 100%;
+		}
+
+		.question-navigation a {
+			text-decoration: none;
+			font-size: 18px;
+			margin-bottom: 20px;
+			color: white;  /* Yazı rengini beyaz yapalım */
+			background-color: #38a169;  /* Yeşil arka plan rengi */
+			padding: 10px 20px;  /* Düğmeye biraz iç boşluk ekleyelim */
+			border-radius: 8px;  /* Kenarlarını yuvarlayalım */
+			font-weight: bold;
+			display: block;  /* Linkin tüm alanını tıklanabilir yapar */
+			text-align: center;  /* Yazıyı ortalar */
+			transition: background-color 0.3s ease;  /* Hover efekti eklerken yumuşak geçiş sağlar */
+		}
+
+		.question-navigation h3 {
+			font-size: 18px;
+			margin-bottom: 10px;
+		}
+
+        .question-navigation a:hover {
+            background-color: #2f855a;
+        }
+
+        .question-list {
+            padding-left: 20px;
+            font-size: 14px;
+            line-height: 1.6;
+            list-style: none;
+        }
+
+        .question-list li {
+            background: white;
+            padding: 6px 10px;
+            border-radius: 6px;
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            margin-bottom: 6px;
+        }
+
+        .question-list li.active {
+            font-weight: bold;
+            color: #2b6cb0;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+                overflow-y: auto;
+                align-items: flex-start;
+                padding: 20px;
+            }
+
+            .quiz-container {
+                margin-left: 0 !important;
+                margin-top: 20px;
+                padding: 24px;
+                width: 100%;
+                max-width: 100%;
+            }
+
+			.question-navigation {
+				position: static;
+				width: 100%;  /* Mobil görünümde genişlik %100 olacak */
+				box-shadow: none;
+				margin-bottom: 20px;
+				padding: 10px;
+				margin-top: 10px;
+			}
+
+            .question-navigation a {
+                width: auto;
+                padding: 8px 16px;
+                font-size: 16px;
+            }
+
+            .question-list {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 6px;
+                padding-left: 0;
+                justify-content: center;
+            }
+
+            .question-list li {
+                flex: 0 0 auto;
+                font-size: 14px;
+                padding: 6px 10px;
+                border-radius: 6px;
+                box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+                cursor: pointer;
+            }
+
+            .question-list li.active {
+                font-weight: bold;
+                color: #2b6cb0;
+            }
+
+            .question {
+                font-size: 20px;
+            }
+
+            .options button {
+                font-size: 16px;
+                padding: 12px 18px;
+            }
+
+            #nextBtn {
+                float: none;
+                display: block;
+                margin: 30px auto 0 auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .question-navigation {
+                width: 100%;
+                padding: 8px;
+            }
+
+            .question-navigation a {
+                font-size: 14px;
+                padding: 8px 12px;
+            }
+
+            .options button {
+                font-size: 14px;
+                padding: 12px;
+            }
+
+            .question {
+                font-size: 18px;
+            }
+
+            #nextBtn {
+                padding: 12px 24px;
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="question-navigation">
+        <a href="index.html">Ana Sayfa</a>
+        <h3>Tüm Sorular</h3>
+        <ol id="questionList" class="question-list"></ol>
+    </div>
+
+    <div class="quiz-container">
+        <div id="quiz">
+            <div class="question" id="question"></div>
+            <ul class="options" id="options"></ul>
+            <button id="nextBtn" type="button">Sonraki Soru</button>
+            <div class="result" id="result"></div>
+            <div id="scoreBox"></div>
+        </div>
+        <footer>
+            Bu test <strong>Elektrik Piyasasında Dağıtım ve Perakende Satış Faaliyetlerine İlişkin Kalite Yönetmeliği</strong> temel alınarak hazırlanmıştır.<br />
+            [ ramazan.bozkurt@tedas.gov.tr ]
+        </footer>
+    </div>
+
+    <script>
+        const harfler = ["A", "B", "C", "D"];
+		const questions = [
+		  { question: "Yönetmeliğin amacı aşağıdakilerden hangisidir?", options: ["Elektrik üretim tesislerinin ruhsatlandırılması", "Elektrik iletim hatlarının özelleştirilmesi", "Kullanıcılara kaliteli ve düşük maliyetli elektrik sunulması", "Tüketici derneklerinin denetlenmesi"], answer: 2 },
+		  { question: "Bildirimli kesintiler, kullanıcıya en az kaç saat önceden bildirilmelidir?", options: ["24 saat", "36 saat", "48 saat", "72 saat"], answer: 2 },
+		  { question: "Tedarik sürekliliği kalitesi aşağıdakilerden hangisini tanımlar?", options: ["Elektrik tüketim bedellerinin hesaplanması", "Mümkün olan asgari kesinti ile enerji sunabilme kapasitesi", "Elektrik üretim kapasitesi", "Gerilim kararlılığı"], answer: 1 },
+		  { question: "Dağıtım faaliyeti kalitesi hangi başlıklar altında izlenir?", options: ["Fiziksel, dijital, çevresel", "İletim, üretim, tüketim", "Tedarik sürekliliği, ticari kalite, teknik kalite", "Gerilim, akım, frekans"], answer: 2 },
+		  { question: "Uzun süreli kesintilerde kentsel bölge için eşik süre aşağıdakilerden hangisidir?", options: ["8 saat", "10 saat", "12 saat", "14 saat"], answer: 1 },
+		  { question: "Hasar başvurusu kullanıcı tarafından en geç kaç gün içinde yapılmalıdır?", options: ["10 gün", "20 gün", "30 gün", "45 gün"], answer: 2 },
+		  { question: "Yıllık bakım raporu en geç ne zamana kadar Kuruma sunulmalıdır?", options: ["31 Aralık", "31 Ocak", "30 Haziran", "31 Temmuz"], answer: 2 },
+		  { question: "OKSÜRE göstergesi aşağıdakilerden hangisini ifade eder?", options: ["Ortalama kesinti süresi", "Ortalama bağlantı süresi", "Ortalama faturalama süresi", "Ortalama bakım süresi"], answer: 0 },
+		  { question: "Perakende satış faaliyetinin ticari kalite göstergeleri hangi tabloda yer alır?", options: ["Tablo 6", "Tablo 9-A", "Tablo 10", "Tablo 4"], answer: 2 },
+		  { question: "Görevli tedarik şirketi, tazminat ödemelerini tüketiciye hangi sürede bildirmelidir?", options: ["30 gün", "Takip eden ay sonuna kadar", "15 gün", "5 iş günü"], answer: 1 },
+		  { question: "Aşağıdakilerden hangisi kısa kesinti tanımına girer?", options: ["1 saniyeden kısa", "1 saniyeden uzun, 3 dakikadan az", "3 dakikadan uzun", "10 dakikadan uzun"], answer: 1 },
+		  { question: "Tedarik sürekliliği göstergelerinden biri olan OKSIK neyi ifade eder?", options: ["Ortalama gerilim değeri", "Ortalama enerji fiyatı", "Ortalama kesinti sıklığı", "Ortalama trafo yükü"], answer: 2 },
+		  { question: "Dağıtım şirketi, yıllık yatırım raporunu en geç hangi tarihe kadar Kuruma sunmalıdır?", options: ["31 Aralık", "30 Haziran", "31 Mart", "30 Eylül"], answer: 1 },
+		  { question: "Genel kalite raporu içerisinde yer alması zorunlu unsurlardan biri aşağıdakilerden hangisidir?", options: ["Abone sözleşmeleri", "Enerji ithalat raporu", "TKSÜRE ve TKSAYI verileri", "Sayaç okuma tarihleri"], answer: 2 },
+		  { question: "Hasarın kullanıcıya bildirimi en geç kaç iş günü içinde yapılmalıdır?", options: ["10 iş günü", "7 iş günü", "3 iş günü", "15 iş günü"], answer: 2 },
+		  { question: "Dağıtım şirketi bildirimsiz kesintiyi bildirimsiz olarak kaydederse ne kadar ceza uygulanır?", options: ["800 TL", "1.000 TL", "1.600 TL", "2.000 TL"], answer: 2 },
+		  { question: "Mücbir sebep başvurusu en geç kaç ay içinde yapılmalıdır?", options: ["1 ay", "2 ay", "3 ay", "6 ay"], answer: 2 },
+		  { question: "Aşağıdakilerden hangisi kesinti nedenlerinden biri değildir?", options: ["Mücbir sebep", "Şebeke işletmecisi", "Kullanıcı itirazı", "Dışsal neden"], answer: 2 },
+		  { question: "Tedarik sürekliliği verileri aylık olarak Kuruma ne zaman bildirilmelidir?", options: ["Ayın 15’ine kadar", "Ayın sonuna kadar", "Ertesi ayın 15’i", "Ertesi ayın sonuna kadar"], answer: 3 },
+		  { question: "Teknik kalite hangi unsurlar dikkate alınarak belirlenir?", options: ["İletim hattı, sayaç tipi, abone sınıfı", "Gerilim, frekans, dalga şekli, üç faz simetrisi", "Sıcaklık, nem, rüzgar", "Enerji ithalat oranı"], answer: 1 },
+		  { question: "Aşağıdakilerden hangisi AG gerilim seviyesi için doğrudur?", options: ["36 kV ve üzeri", "1000 Volt altı", "630 kVA üzeri", "50 Hz üzeri"], answer: 1 },
+		  { question: "Dağıtım şirketi kullanıcı başvurusu olmadan ödeme yapar mı?", options: ["Hayır, başvuru gerekir", "Sadece ticari kalite için", "Evet, bazı tazminatlar için başvuru gerekmez", "Sadece mesken aboneleri için"], answer: 2 },
+		  { question: "Tazminat bildirimi uzun süreli kesintiler için hangi sürede yapılmalıdır?", options: ["30 gün", "Takip eden ay sonuna kadar", "5 iş günü", "Ertesi yıl 31 Ocak"], answer: 1 },
+		  { question: "Teknik kalite verilerinin içeriği kim tarafından belirlenir?", options: ["Bakanlık", "TEDAŞ", "Kurul", "İl müdürlükleri"], answer: 2 },
+		  { question: "TKSAYI nedir?", options: ["Toplam kısa süreli kesinti adedi", "Toplam fatura gecikme süresi", "Toplam uzun ve kısa kesinti sayısı", "Tüketici sayısı"], answer: 2 },
+		  { question: "Yıllık tazminatın üst limiti sistem işletim geliri tavanının yüzde kaçıdır?", options: ["%0.2", "%0.4", "%1", "%2"], answer: 2 },
+		  { question: "Uzun süreli kesinti tazminatı mesken aboneleri için kaç TL’dir?", options: ["40 TL", "80 TL", "160 TL", "960 TL"], answer: 1 },
+		  { question: "Dağıtılmayan enerji hangi veriyle hesaplanmaz?", options: ["Tüketici grubu", "Saatlik çarpan", "Sayaç okuma zamanı", "Tüketim profili"], answer: 2 },
+		  { question: "Aşağıdaki bölgelerden hangisi kırsal bölge olarak tanımlanır?", options: ["Merkez mahalle", "2000 üzeri nüfuslu ilçe", "2000’den az nüfuslu mahalle, köy ve mezralar", "50.000 üzeri il merkezi"], answer: 2 },
+		  { question: "Bildirimsiz kesintide Tablo 7-A’ya kayıt yapılmazsa ceza ne kadar olur?", options: ["1600 TL", "3200 TL", "5000 TL", "8000 TL"], answer: 3 },
+		  { question: "Kesintiden etkilenen kullanıcı sayısı hangi veriye göre belirlenir?", options: ["Sayaç numarası", "Tesisat numarası", "TKSÜRE kayıtları", "TKSAYI dağılımı"], answer: 2 },
+		  { question: "TKSÜRE göstergesi aşağıdakilerden hangisini ifade eder?", options: ["Trafo kayıp süresi", "Toplam kesinti süresi", "Tüketici kota süresi", "Teknik kontrol süresi"], answer: 1 },
+		  { question: "Uzun süreli kesintilerden dolayı yapılan tazminatlar için yıllık toplam ödeme üst sınırı aşağıdakilerden hangisidir?", options: ["%0.4", "%0.8", "%1.2", "%2"], answer: 2 },
+		  { question: "Dağıtım şirketleri kalite göstergelerini kamuya açıklamakla yükümlü müdür?", options: ["Evet", "Hayır", "Sadece Bakanlık isterse", "Talebe bağlı"], answer: 0 },
+		  { question: "Tablo 5 hangi kalite verilerini içerir?", options: ["Tüketici başvuruları", "Şikayet sayıları", "Tedarik sürekliliği göstergeleri", "Tarife verileri"], answer: 2 },
+		  { question: "Dağıtım şirketi kalite göstergelerini hangi platformda yayınlar?", options: ["Resmî Gazete", "Kendi internet sitesi", "TEDAŞ sayfası", "Bakanlık arşivi"], answer: 1 },
+		  { question: "Teknik kalite kayıtları en az kaç yıl süreyle saklanır?", options: ["2 yıl", "5 yıl", "10 yıl", "Saklama zorunluluğu yoktur"], answer: 1 },
+		  { question: "Hasar tazminatında kullanıcı fatura ibraz ederse ödeme süresi nedir?", options: ["3 iş günü", "5 iş günü", "10 iş günü", "15 iş günü"], answer: 1 },
+		  { question: "Tazminat ödemeleri yapılmazsa nasıl işlem yapılır?", options: ["Faturalandırmaya yansıtılır", "Sistem işletim gelirinden düşülür", "İdari para cezası uygulanır", "Tüketiciye bildirim yapılır"], answer: 1 },
+		  { question: "Perakende satış faaliyetinin kalitesinden kim sorumludur?", options: ["Dağıtım şirketi", "Kurum", "Görevli tedarik şirketi", "Abone"], answer: 2 },
+		  { question: "Kesintiden etkilenen kullanıcı sayısı hangi veriye göre belirlenir?", options: ["Sayaç numarası", "Tesisat numarası", "TKSÜRE kayıtları", "TKSAYI dağılımı"], answer: 2 },
+		  { question: "TKSÜRE göstergesi aşağıdakilerden hangisini ifade eder?", options: ["Trafo kayıp süresi", "Toplam kesinti süresi", "Tüketici kota süresi", "Teknik kontrol süresi"], answer: 1 },
+		  { question: "Uzun süreli kesintilerden dolayı yapılan tazminatlar için yıllık toplam ödeme üst sınırı aşağıdakilerden hangisidir?", options: ["%0.4", "%0.8", "%1.2", "%2"], answer: 2 },
+		  { question: "Dağıtım şirketleri kalite göstergelerini kamuya açıklamakla yükümlü müdür?", options: ["Evet", "Hayır", "Sadece Bakanlık isterse", "Talebe bağlı"], answer: 0 },
+		  { question: "Tablo 5 hangi kalite verilerini içerir?", options: ["Tüketici başvuruları", "Şikayet sayıları", "Tedarik sürekliliği göstergeleri", "Tarife verileri"], answer: 2 },
+		  { question: "Dağıtım şirketi kalite göstergelerini hangi platformda yayınlar?", options: ["Resmî Gazete", "Kendi internet sitesi", "TEDAŞ sayfası", "Bakanlık arşivi"], answer: 1 },
+		  { question: "Teknik kalite kayıtları en az kaç yıl süreyle saklanır?", options: ["2 yıl", "5 yıl", "10 yıl", "Saklama zorunluluğu yoktur"], answer: 1 },
+		  { question: "Hasar tazminatında kullanıcı fatura ibraz ederse ödeme süresi nedir?", options: ["3 iş günü", "5 iş günü", "10 iş günü", "15 iş günü"], answer: 1 },
+		  { question: "Tazminat ödemeleri yapılmazsa nasıl işlem yapılır?", options: ["Faturalandırmaya yansıtılır", "Sistem işletim gelirinden düşülür", "İdari para cezası uygulanır", "Tüketiciye bildirim yapılır"], answer: 1 },
+		  { question: "Perakende satış faaliyetinin kalitesinden kim sorumludur?", options: ["Dağıtım şirketi", "Kurum", "Görevli tedarik şirketi", "Abone"], answer: 2 },
+		  { question: "Çağrı merkezi hizmeti kesintisiz verilmek zorunda mıdır?", options: ["Hayır", "Evet", "Sadece hafta içi", "Sadece bildirimli kesintilerde"], answer: 1 },
+		  { question: "Arıza bilgileri hangi sisteme kaydedilir?", options: ["OSOS", "TSKS", "DABS", "MARS"], answer: 1 },
+		  { question: "Tazminat ödemeleri hangi kriterlere göre yapılır?", options: ["Yıl sonu bilançosu", "Tarifeler", "Tablo 9-A ve 10’daki göstergelere göre", "Teknik analiz sonucu"], answer: 2 },
+		  { question: "Ticari kalite kapsamında tazminat başvurusu gerekli midir?", options: ["Evet", "Hayır", "İl bazında değişir", "Yalnız kırsalda gereklidir"], answer: 1 },
+		  { question: "Şirketlerin yatırım raporu içeriği kim tarafından belirlenir?", options: ["Bakanlık", "Kurul", "TEDAŞ", "TSE"], answer: 1 },
+		  { question: "Tedarik sürekliliği verileri aşağıdaki hangi tarihe kadar kamuya açıklanmalıdır?", options: ["31 Aralık", "30 Haziran", "31 Ocak", "30 Nisan"], answer: 2 },
+		  { question: "Genel kalite raporu en geç hangi tarihe kadar Kuruma sunulmalıdır?", options: ["31 Mart", "30 Haziran", "31 Aralık", "30 Nisan"], answer: 1 },
+		  { question: "Teknik kalite göstergeleri aşağıdakilerden hangisini içermez?", options: ["Gerilim dalgalanması", "Frekans kararlılığı", "Üç faz simetrisi", "Enerji maliyeti"], answer: 3 },
+		  { question: "Kesintiler aşağıdakilerden hangisine göre sınıflandırılmaz?", options: ["Süresine göre", "Sebebine göre", "Maliyetine göre", "Bildirim durumuna göre"], answer: 2 },
+		  { question: "Dağıtım şirketleri kalite göstergeleri ile ilgili verileri hangi sisteme girer?", options: ["EBA", "EDVARS", "UEDAŞ", "TUSKİ"], answer: 1 },
+		  { question: "Bildirimli kesintilerde kullanıcıya en az kaç saat öncesinden bilgi verilmelidir?", options: ["12 saat", "24 saat", "36 saat", "48 saat"], answer: 3 },
+		  { question: "TKSÜRE göstergesi hangi birimle ölçülür?", options: ["Adet", "Volt", "Dakika", "Saat"], answer: 3 },
+		  { question: "Tazminat tutarı mesken aboneleri için en az ne kadardır?", options: ["20 TL", "40 TL", "80 TL", "160 TL"], answer: 2 },
+		  { question: "Tazminat ödemesi yapılmadığında hangi işlem uygulanır?", options: ["Abone hizmeti durdurulur", "Teknik rapor istenir", "İdari para cezası verilir", "Tutar sistem işletim gelirinden düşülür"], answer: 3 },
+		  { question: "Kesinti kayıtları hangi sistem ile şebeke modeli ile eşleştirilir?", options: ["OSOS", "SCADA", "TSKS", "ERP"], answer: 2 },
+		  { question: "Kullanıcıdan tazminat başvurusu alınmadan ödeme yapılması hangi durumda geçerlidir?", options: ["Hasar durumunda", "Uzun süreli kesintilerde", "Sayaç okuma hatalarında", "Borçtan dolayı kesintide"], answer: 1 },
+		  { question: "Görevli tedarik şirketi ticari kaliteye ilişkin tazminatları hangi tabloya göre belirler?", options: ["Tablo 8", "Tablo 9", "Tablo 10", "Tablo 11"], answer: 2 },
+		  { question: "Kullanıcı hasar başvurusu yaptıysa dağıtım şirketi sonucu en geç kaç iş günü içinde bildirmelidir?", options: ["3 iş günü", "5 iş günü", "7 iş günü", "10 iş günü"], answer: 0 },
+		  { question: "Teknik kalite göstergelerinin hesap yöntemleri kim tarafından belirlenir?", options: ["Dağıtım şirketi", "Kurum (EPDK)", "Enerji Bakanlığı", "TSE"], answer: 1 },
+		  { question: "Genel kalite raporunda hangi göstergeler mutlaka yer almalıdır?", options: ["Elektrik fiyat endeksi", "TKSÜRE ve TKSAYI", "Fatura gecikme süresi", "Şebeke yatırım oranı"], answer: 1 },
+		];
+
+        let currentQuestion = 0;
+        let score = 0;
+        const questionEl = document.getElementById("question");
+        const optionsEl = document.getElementById("options");
+        const resultEl = document.getElementById("result");
+        const nextBtn = document.getElementById("nextBtn");
+        const scoreBox = document.getElementById("scoreBox");
+
+        function loadQuestion() {
+            const allNavItems = document.querySelectorAll('#questionList li');
+            allNavItems.forEach((item, idx) => {
+                item.classList.remove('active');
+                if (idx === currentQuestion) {
+                    item.classList.add('active');
+                }
+            });
+
+            const questionList = document.getElementById("questionList");
+            if (questionList && questionList.children.length === 0) {
+                questions.forEach((q, i) => {
+                    const li = document.createElement("li");
+                    li.textContent = `Soru ${i + 1}`;
+                    li.onclick = () => {
+                        currentQuestion = i;
+                        loadQuestion();
+                    };
+                    questionList.appendChild(li);
+                });
+            }
+
+            const q = questions[currentQuestion];
+            questionEl.textContent = `Soru ${currentQuestion + 1}: ${q.question}`;
+            optionsEl.innerHTML = "";
+            resultEl.textContent = "";
+            nextBtn.style.display = "none";
+            scoreBox.textContent = `Puan: ${score} / ${questions.length}`;
+
+            q.options.forEach((opt, index) => {
+                const li = document.createElement("li");
+                const btn = document.createElement("button");
+                btn.textContent = `${harfler[index]}) ${opt}`;
+                btn.onclick = () => checkAnswer(index, btn);
+                li.appendChild(btn);
+                optionsEl.appendChild(li);
+            });
+        }
+
+        function checkAnswer(selected, btnClicked) {
+            const q = questions[currentQuestion];
+            const buttons = document.querySelectorAll(".options button");
+
+            buttons.forEach((btn, idx) => {
+                btn.disabled = true;
+                btn.classList.remove("correct", "incorrect");
+                if (idx === q.answer) {
+                    btn.classList.add("correct");
+                }
+            });
+
+            if (selected === q.answer) {
+                score++;
+                resultEl.textContent = "Doğru cevap!";
+                resultEl.className = "result correct";
+            } else {
+                resultEl.textContent = "Yanlış cevap.";
+                resultEl.className = "result incorrect";
+                btnClicked.classList.add("incorrect");
+            }
+
+            nextBtn.style.display = "inline-block";
+            scoreBox.textContent = `Puan: ${score} / ${questions.length}`;
+        }
+
+        nextBtn.onclick = () => {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+            } else {
+                questionEl.textContent = "Test tamamlandı!";
+                optionsEl.innerHTML = "";
+                nextBtn.style.display = "none";
+                resultEl.textContent = `Tebrikler! ${score} / ${questions.length} doğru cevap verdiniz.`;
+                resultEl.className = "result correct";
+            }
+        };
+
+        loadQuestion();
+    </script>
+</body>
+
+</html>

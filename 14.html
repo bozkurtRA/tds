@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>rA | TEDAŞ Genel Müdürlüğü İş Sağlığı ve Güvenliği Yönergesi Testi</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(120deg, #f0f4f8, #d9e2ec);
+            margin: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-bottom: 20px;
+        }
+
+		.quiz-container {
+			background: #ffffff;
+			padding: 50px;
+			border-radius: 24px;
+			box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+			max-width: 100%;
+			width: 70%;  /* PC'de genişliği %70 yapıyoruz */
+			box-sizing: border-box;
+			margin: 20px;
+			margin-left: 20%;  /* Sol taraftan %10 boşluk bırakarak sağa kaydırıyoruz */
+		}
+
+        .question {
+            font-size: 24px;
+            margin-bottom: 30px;
+            font-weight: 600;
+            color: #102a43;
+            text-align: center;
+        }
+
+        .options {
+            list-style: none;
+            padding: 0;
+        }
+
+        .options li {
+            margin-bottom: 18px;
+        }
+
+        .options button {
+            width: 100%;
+            text-align: left;
+            background: #e3ebf6;
+            border: none;
+            border-radius: 10px;
+            padding: 16px 24px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        .options button:hover {
+            background: #c7d7ea;
+            transform: scale(1.01);
+        }
+
+        .options button.correct {
+            background-color: #38a169 !important;
+            color: white;
+            font-weight: bold;
+        }
+
+        .options button.incorrect {
+            background-color: #e53e3e !important;
+            color: white;
+            font-weight: bold;
+        }
+
+        .result {
+            margin-top: 30px;
+            font-weight: bold;
+            font-size: 20px;
+            text-align: center;
+        }
+
+        .result.correct {
+            color: green;
+        }
+
+        .result.incorrect {
+            color: red;
+        }
+
+        #nextBtn {
+            margin-top: 35px;
+            background: #2b6cb0;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: none;
+            float: right;
+        }
+
+        #nextBtn:hover {
+            background: #2c5282;
+        }
+
+        #scoreBox {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: #2b6cb0;
+        }
+
+        footer {
+            margin-top: 60px;
+            text-align: center;
+            font-size: 15px;
+            color: #555;
+        }
+
+		.question-navigation {
+			position: fixed;
+			left: 0;
+			top: 0;
+			bottom: 0;
+			width: 140px; /* Genişliği küçülttük */
+			overflow-y: auto;
+			background: #e2e8f0;
+			padding: 20px;
+			box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+			z-index: 1;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: flex-start;
+		}
+
+		.question-navigation a,
+		.question-navigation h3 {
+			text-align: center; /* Link ve başlıkları ortalar */
+			width: 100%;
+		}
+
+		.question-navigation a {
+			text-decoration: none;
+			font-size: 18px;
+			margin-bottom: 20px;
+			color: white;  /* Yazı rengini beyaz yapalım */
+			background-color: #38a169;  /* Yeşil arka plan rengi */
+			padding: 10px 20px;  /* Düğmeye biraz iç boşluk ekleyelim */
+			border-radius: 8px;  /* Kenarlarını yuvarlayalım */
+			font-weight: bold;
+			display: block;  /* Linkin tüm alanını tıklanabilir yapar */
+			text-align: center;  /* Yazıyı ortalar */
+			transition: background-color 0.3s ease;  /* Hover efekti eklerken yumuşak geçiş sağlar */
+		}
+
+		.question-navigation h3 {
+			font-size: 18px;
+			margin-bottom: 10px;
+		}
+
+        .question-navigation a:hover {
+            background-color: #2f855a;
+        }
+
+        .question-list {
+            padding-left: 20px;
+            font-size: 14px;
+            line-height: 1.6;
+            list-style: none;
+        }
+
+        .question-list li {
+            background: white;
+            padding: 6px 10px;
+            border-radius: 6px;
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            margin-bottom: 6px;
+        }
+
+        .question-list li.active {
+            font-weight: bold;
+            color: #2b6cb0;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+                overflow-y: auto;
+                align-items: flex-start;
+                padding: 20px;
+            }
+
+            .quiz-container {
+                margin-left: 0 !important;
+                margin-top: 20px;
+                padding: 24px;
+                width: 100%;
+                max-width: 100%;
+            }
+
+			.question-navigation {
+				position: static;
+				width: 100%;  /* Mobil görünümde genişlik %100 olacak */
+				box-shadow: none;
+				margin-bottom: 20px;
+				padding: 10px;
+				margin-top: 10px;
+			}
+
+            .question-navigation a {
+                width: auto;
+                padding: 8px 16px;
+                font-size: 16px;
+            }
+
+            .question-list {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 6px;
+                padding-left: 0;
+                justify-content: center;
+            }
+
+            .question-list li {
+                flex: 0 0 auto;
+                font-size: 14px;
+                padding: 6px 10px;
+                border-radius: 6px;
+                box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+                cursor: pointer;
+            }
+
+            .question-list li.active {
+                font-weight: bold;
+                color: #2b6cb0;
+            }
+
+            .question {
+                font-size: 20px;
+            }
+
+            .options button {
+                font-size: 16px;
+                padding: 12px 18px;
+            }
+
+            #nextBtn {
+                float: none;
+                display: block;
+                margin: 30px auto 0 auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .question-navigation {
+                width: 100%;
+                padding: 8px;
+            }
+
+            .question-navigation a {
+                font-size: 14px;
+                padding: 8px 12px;
+            }
+
+            .options button {
+                font-size: 14px;
+                padding: 12px;
+            }
+
+            .question {
+                font-size: 18px;
+            }
+
+            #nextBtn {
+                padding: 12px 24px;
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="question-navigation">
+        <a href="index.html">Ana Sayfa</a>
+        <h3>Tüm Sorular</h3>
+        <ol id="questionList" class="question-list"></ol>
+    </div>
+
+    <div class="quiz-container">
+        <div id="quiz">
+            <div class="question" id="question"></div>
+            <ul class="options" id="options"></ul>
+            <button id="nextBtn" type="button">Sonraki Soru</button>
+            <div class="result" id="result"></div>
+            <div id="scoreBox"></div>
+        </div>
+        <footer>
+            Bu test <strong>TEDAŞ Genel Müdürlüğü İş Sağlığı ve Güvenliği Yönergesi</strong> temel alınarak hazırlanmıştır.<br />
+            [ ramazan.bozkurt@tedas.gov.tr ]
+        </footer>
+    </div>
+
+    <script>
+        const harfler = ["A", "B", "C", "D"];
+		const questions = [
+		  { question: "Yönergenin amacı nedir?", options: ["İşyeri düzenini sağlamak", "Personel özlük işlerini düzenlemek", "İş sağlığı ve güvenliğini sağlamak ve kuralları belirlemek", "İdari ve mali işler yürütmek"], answer: 2 },
+		  { question: "Aşağıdakilerden hangisi bu Yönergenin kapsamına girmez?", options: ["TEDAŞ taşra teşkilatı çalışanları", "Stajyerler", "TEDAŞ ile ilgisi olmayan diğer kamu çalışanları", "Alt yüklenici çalışanları"], answer: 2 },
+		  { question: "Yönerge hangi standarda dayalı olarak hazırlanmıştır?", options: ["ISO 9001", "ISO 14001", "ISO 45001", "ISO 27001"], answer: 2 },
+		  { question: "Aşağıdakilerden hangisi işverenin yükümlülüklerinden biri değildir?", options: ["Kişisel koruyucu donanımı sağlamak", "Risk değerlendirmesi yapmak", "Çalışan temsilcisi seçmek", "Acil durum tahliye planları hazırlamak"], answer: 2 },
+		  { question: "Çalışanlar aşağıdakilerden hangisini yapmakla yükümlüdür?", options: ["Kişisel koruyucu donanımı kullanmamak", "Eğitimlere katılmak", "Keyfi olarak güvenlik ekipmanlarını çıkarmak", "Tehlikeleri gizlemek"], answer: 1 },
+		  { question: "İSG Kurulu hangi durumda oluşturulmak zorundadır?", options: ["Her işyerinde", "10’dan fazla çalışanın olduğu her yerde", "50’den az çalışanın olduğu yerlerde", "50’den fazla çalışanın ve 6 aydan uzun süren işlerin yapıldığı işyerlerinde"], answer: 3 },
+		  { question: "Aşağıdakilerden hangisi İSG Kurulunun görevlerinden biridir?", options: ["İşe alım prosedürlerini belirlemek", "Mali raporları incelemek", "İş kazalarını araştırmak", "Satın alma süreçlerini yürütmek"], answer: 2 },
+		  { question: "İş kazası olarak sayılabilmesi için aşağıdaki durumlardan hangisi gereklidir?", options: ["Çalışanın evde olması", "İş dışı sebeple kaza geçirmesi", "İşveren tarafından sağlanan taşıtla işe giderken kaza geçirmesi", "Tatil gününde gezide olması"], answer: 2 },
+		  { question: "Hangi belgeyle işe giriş eğitimi belgelendirilir?", options: ["FR.0302", "FR.0613", "FR.0296", "FR.0306"], answer: 1 },
+		  { question: "Tehlike tanımlama ve risk değerlendirme çalışmaları hangi prosedüre göre yapılır?", options: ["PR.101", "PR.107", "PR.119", "PR.188"], answer: 1 },
+		  { question: "Aşağıdakilerden hangisi kişisel koruyucu donanımı tanımlar?", options: ["Ortamın aydınlatılmasını sağlayan sistemler", "Çalışanı işten kaynaklı risklere karşı koruyan giysi, cihaz ve ekipmanlar", "Ortak kullanım araçları", "Ofis mobilyaları"], answer: 1 },
+		  { question: "İşyerinde ramak kala olay bildirimi nasıl yapılır?", options: ["Sözlü bildirimle", "Dilekçe ile", "FR.0306 formu ile", "FR.0297 formu ile"], answer: 2 },
+		  { question: "İş güvenliği uzmanı, görevlerini hangi yönetmeliğe göre yürütür?", options: ["6331 sayılı İş Sağlığı ve Güvenliği Kanunu", "İş Güvenliği Uzmanlarının Görev, Yetki, Sorumluluk ve Eğitimleri Hakkında Yönetmelik", "Sosyal Sigortalar ve Genel Sağlık Sigortası Kanunu", "İSG Kurulları Hakkında Yönetmelik"], answer: 1 },
+		  { question: "Aşağıdakilerden hangisi işyeri hekiminin dayandığı yönetmeliktir?", options: ["28713 sayılı İşyeri Hekimliği ve Diğer Sağlık Personeli Yönetmeliği", "6331 sayılı İSG Kanunu", "Tehlikeli Madde Güvenliği Yönetmeliği", "Ramak Kala Bildirimi Prosedürü"], answer: 0 },
+		  { question: "Çalışan temsilcisi aşağıdaki belgelerden hangisine göre görev yapar?", options: ["KKD Kullanım Talimatı", "Olay Sınıflandırma Prosedürü", "Çalışan Temsilcisinin Nitelikleri Tebliği", "İSG Kurulu Yıllık Raporu"], answer: 2 },
+		  { question: "Aşağıdakilerden hangisi iş kazası sayılacak durumlardan biri değildir?", options: ["Çalışanın işyerinde bulunurken kaza geçirmesi", "Görevle başka yere gönderildiği zaman kazaya uğraması", "İşyerinden çıkış yaptıktan sonra kendi özel aracıyla evine dönerken kaza geçirmesi", "İşverenin sağladığı taşıma aracında kazaya uğraması"], answer: 2 },
+		  { question: "Ramak kala olay bildirimi hangi form ile yapılır?", options: ["FR.0296", "FR.0302", "FR.0306", "FR.0613"], answer: 2 },
+		  { question: "Ziyaretçilerin işyerindeki riskler hakkında bilgilendirilmesinde hangi doküman esas alınır?", options: ["FR.0297 Kaza Açıklama Tutanağı", "FR.0239 Ziyaretçi Talimatı ve Tutanağı", "FR.0613 İşbaşı Eğitim Formu", "TL.191 KKD Kullanma Talimatı"], answer: 1 },
+		  { question: "Tehlike Tanımlama ve Risk Değerlendirme Prosedürü'nün kodu nedir?", options: ["PR.102", "PR.101", "PR.107", "PR.119"], answer: 2 },
+		  { question: "İşe başlama eğitimi hangi prosedüre göre gerçekleştirilir?", options: ["PR.119", "PR.058", "TL.184", "PR.188"], answer: 0 },
+		  { question: "İSG’ye dair çalışma talimatları nerede yayımlanır?", options: ["Duyuru panolarında", "SGK web sitesinde", "EBYS ve QDMS sistemlerinde", "İSG Kurulu defterinde"], answer: 2 },
+		  { question: "Yönergede hüküm bulunmayan durumlarda hangi kurallar geçerlidir?", options: ["Yöneticinin kararları", "Önceki yönergeler", "İlgili mevzuat hükümleri", "İSG Kurulu önerileri"], answer: 2 },
+		  { question: "Önceki İSG Yönergesi hangi tarihte yürürlükten kaldırılmıştır?", options: ["14.02.2018", "18.01.2013", "30.06.2006", "22.05.2003"], answer: 2 },
+		  { question: "Yönergeyi kim yürütür?", options: ["İSG Kurulu", "İşveren vekili", "TEDAŞ Genel Müdürü", "Bakanlık"], answer: 2 },
+		];
+
+        let currentQuestion = 0;
+        let score = 0;
+        const questionEl = document.getElementById("question");
+        const optionsEl = document.getElementById("options");
+        const resultEl = document.getElementById("result");
+        const nextBtn = document.getElementById("nextBtn");
+        const scoreBox = document.getElementById("scoreBox");
+
+        function loadQuestion() {
+            const allNavItems = document.querySelectorAll('#questionList li');
+            allNavItems.forEach((item, idx) => {
+                item.classList.remove('active');
+                if (idx === currentQuestion) {
+                    item.classList.add('active');
+                }
+            });
+
+            const questionList = document.getElementById("questionList");
+            if (questionList && questionList.children.length === 0) {
+                questions.forEach((q, i) => {
+                    const li = document.createElement("li");
+                    li.textContent = `Soru ${i + 1}`;
+                    li.onclick = () => {
+                        currentQuestion = i;
+                        loadQuestion();
+                    };
+                    questionList.appendChild(li);
+                });
+            }
+
+            const q = questions[currentQuestion];
+            questionEl.textContent = `Soru ${currentQuestion + 1}: ${q.question}`;
+            optionsEl.innerHTML = "";
+            resultEl.textContent = "";
+            nextBtn.style.display = "none";
+            scoreBox.textContent = `Puan: ${score} / ${questions.length}`;
+
+            q.options.forEach((opt, index) => {
+                const li = document.createElement("li");
+                const btn = document.createElement("button");
+                btn.textContent = `${harfler[index]}) ${opt}`;
+                btn.onclick = () => checkAnswer(index, btn);
+                li.appendChild(btn);
+                optionsEl.appendChild(li);
+            });
+        }
+
+        function checkAnswer(selected, btnClicked) {
+            const q = questions[currentQuestion];
+            const buttons = document.querySelectorAll(".options button");
+
+            buttons.forEach((btn, idx) => {
+                btn.disabled = true;
+                btn.classList.remove("correct", "incorrect");
+                if (idx === q.answer) {
+                    btn.classList.add("correct");
+                }
+            });
+
+            if (selected === q.answer) {
+                score++;
+                resultEl.textContent = "Doğru cevap!";
+                resultEl.className = "result correct";
+            } else {
+                resultEl.textContent = "Yanlış cevap.";
+                resultEl.className = "result incorrect";
+                btnClicked.classList.add("incorrect");
+            }
+
+            nextBtn.style.display = "inline-block";
+            scoreBox.textContent = `Puan: ${score} / ${questions.length}`;
+        }
+
+        nextBtn.onclick = () => {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+            } else {
+                questionEl.textContent = "Test tamamlandı!";
+                optionsEl.innerHTML = "";
+                nextBtn.style.display = "none";
+                resultEl.textContent = `Tebrikler! ${score} / ${questions.length} doğru cevap verdiniz.`;
+                resultEl.className = "result correct";
+            }
+        };
+
+        loadQuestion();
+    </script>
+</body>
+
+</html>

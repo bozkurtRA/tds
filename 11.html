@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>rA | Elektrik Piyasası Tüketici Hizmetleri Yönetmeliği Testi</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(120deg, #f0f4f8, #d9e2ec);
+            margin: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-bottom: 20px;
+        }
+
+		.quiz-container {
+			background: #ffffff;
+			padding: 50px;
+			border-radius: 24px;
+			box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+			max-width: 100%;
+			width: 70%;  /* PC'de genişliği %70 yapıyoruz */
+			box-sizing: border-box;
+			margin: 20px;
+			margin-left: 20%;  /* Sol taraftan %10 boşluk bırakarak sağa kaydırıyoruz */
+		}
+
+        .question {
+            font-size: 24px;
+            margin-bottom: 30px;
+            font-weight: 600;
+            color: #102a43;
+            text-align: center;
+        }
+
+        .options {
+            list-style: none;
+            padding: 0;
+        }
+
+        .options li {
+            margin-bottom: 18px;
+        }
+
+        .options button {
+            width: 100%;
+            text-align: left;
+            background: #e3ebf6;
+            border: none;
+            border-radius: 10px;
+            padding: 16px 24px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        .options button:hover {
+            background: #c7d7ea;
+            transform: scale(1.01);
+        }
+
+        .options button.correct {
+            background-color: #38a169 !important;
+            color: white;
+            font-weight: bold;
+        }
+
+        .options button.incorrect {
+            background-color: #e53e3e !important;
+            color: white;
+            font-weight: bold;
+        }
+
+        .result {
+            margin-top: 30px;
+            font-weight: bold;
+            font-size: 20px;
+            text-align: center;
+        }
+
+        .result.correct {
+            color: green;
+        }
+
+        .result.incorrect {
+            color: red;
+        }
+
+        #nextBtn {
+            margin-top: 35px;
+            background: #2b6cb0;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: none;
+            float: right;
+        }
+
+        #nextBtn:hover {
+            background: #2c5282;
+        }
+
+        #scoreBox {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: #2b6cb0;
+        }
+
+        footer {
+            margin-top: 60px;
+            text-align: center;
+            font-size: 15px;
+            color: #555;
+        }
+
+		.question-navigation {
+			position: fixed;
+			left: 0;
+			top: 0;
+			bottom: 0;
+			width: 140px; /* Genişliği küçülttük */
+			overflow-y: auto;
+			background: #e2e8f0;
+			padding: 20px;
+			box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+			z-index: 1;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: flex-start;
+		}
+
+		.question-navigation a,
+		.question-navigation h3 {
+			text-align: center; /* Link ve başlıkları ortalar */
+			width: 100%;
+		}
+
+		.question-navigation a {
+			text-decoration: none;
+			font-size: 18px;
+			margin-bottom: 20px;
+			color: white;  /* Yazı rengini beyaz yapalım */
+			background-color: #38a169;  /* Yeşil arka plan rengi */
+			padding: 10px 20px;  /* Düğmeye biraz iç boşluk ekleyelim */
+			border-radius: 8px;  /* Kenarlarını yuvarlayalım */
+			font-weight: bold;
+			display: block;  /* Linkin tüm alanını tıklanabilir yapar */
+			text-align: center;  /* Yazıyı ortalar */
+			transition: background-color 0.3s ease;  /* Hover efekti eklerken yumuşak geçiş sağlar */
+		}
+
+		.question-navigation h3 {
+			font-size: 18px;
+			margin-bottom: 10px;
+		}
+
+        .question-navigation a:hover {
+            background-color: #2f855a;
+        }
+
+        .question-list {
+            padding-left: 20px;
+            font-size: 14px;
+            line-height: 1.6;
+            list-style: none;
+        }
+
+        .question-list li {
+            background: white;
+            padding: 6px 10px;
+            border-radius: 6px;
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            margin-bottom: 6px;
+        }
+
+        .question-list li.active {
+            font-weight: bold;
+            color: #2b6cb0;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+                overflow-y: auto;
+                align-items: flex-start;
+                padding: 20px;
+            }
+
+            .quiz-container {
+                margin-left: 0 !important;
+                margin-top: 20px;
+                padding: 24px;
+                width: 100%;
+                max-width: 100%;
+            }
+
+			.question-navigation {
+				position: static;
+				width: 100%;  /* Mobil görünümde genişlik %100 olacak */
+				box-shadow: none;
+				margin-bottom: 20px;
+				padding: 10px;
+				margin-top: 10px;
+			}
+
+            .question-navigation a {
+                width: auto;
+                padding: 8px 16px;
+                font-size: 16px;
+            }
+
+            .question-list {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 6px;
+                padding-left: 0;
+                justify-content: center;
+            }
+
+            .question-list li {
+                flex: 0 0 auto;
+                font-size: 14px;
+                padding: 6px 10px;
+                border-radius: 6px;
+                box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+                cursor: pointer;
+            }
+
+            .question-list li.active {
+                font-weight: bold;
+                color: #2b6cb0;
+            }
+
+            .question {
+                font-size: 20px;
+            }
+
+            .options button {
+                font-size: 16px;
+                padding: 12px 18px;
+            }
+
+            #nextBtn {
+                float: none;
+                display: block;
+                margin: 30px auto 0 auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .question-navigation {
+                width: 100%;
+                padding: 8px;
+            }
+
+            .question-navigation a {
+                font-size: 14px;
+                padding: 8px 12px;
+            }
+
+            .options button {
+                font-size: 14px;
+                padding: 12px;
+            }
+
+            .question {
+                font-size: 18px;
+            }
+
+            #nextBtn {
+                padding: 12px 24px;
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="question-navigation">
+        <a href="index.html">Ana Sayfa</a>
+        <h3>Tüm Sorular</h3>
+        <ol id="questionList" class="question-list"></ol>
+    </div>
+
+    <div class="quiz-container">
+        <div id="quiz">
+            <div class="question" id="question"></div>
+            <ul class="options" id="options"></ul>
+            <button id="nextBtn" type="button">Sonraki Soru</button>
+            <div class="result" id="result"></div>
+            <div id="scoreBox"></div>
+        </div>
+        <footer>
+            Bu test <strong>Elektrik Piyasası Tüketici Hizmetleri Yönetmeliği</strong> temel alınarak hazırlanmıştır.<br />
+            [ ramazan.bozkurt@tedas.gov.tr ]
+        </footer>
+    </div>
+
+    <script>
+        const harfler = ["A", "B", "C", "D"];
+		const questions = [
+		  { question: "Elektrik Piyasası Tüketici Hizmetleri Yönetmeliği hangi kanuna dayanılarak hazırlanmıştır?", options: ["4628 sayılı Elektrik Piyasası Kanunu", "5018 sayılı Kamu Mali Yönetimi Kanunu", "6446 sayılı Elektrik Piyasası Kanunu", "4734 sayılı Kamu İhale Kanunu"], answer: 2 },
+		  { question: "Yönetmeliğin amacı aşağıdakilerden hangisidir?", options: ["Elektrik üretimini desteklemek", "Tüketici ve tedarikçiler arasındaki iş ve işlemleri düzenlemek", "EPDK'nın görevlerini belirtmek", "İletim sistemleri ile ilgili esasları belirlemek"], answer: 1 },
+		  { question: "Aşağıdakilerden hangisi serbest olmayan tüketici tanımına girer?", options: ["Yıllık tüketimi 100.000 kWh’tan fazla olan", "İletim sistemine doğrudan bağlı olan", "Tedarikçisini seçme hakkına sahip olmayan", "Organize sanayi bölgesinde bulunan"], answer: 2 },
+		  { question: "Kalıcı veri saklayıcısı tanımı aşağıdakilerden hangisini kapsamaz?", options: ["Kısa mesaj", "DVD", "Disk", "Kâğıt belge"], answer: 3 },
+		  { question: "Serbest tüketici statüsü aşağıdakilerden hangisiyle kazanılmaz?", options: ["İletim sistemine doğrudan bağlı olmak", "Yıllık tüketimin serbest tüketici limitini aşması", "Organize sanayi bölgesi olmak", "Elektrik dağıtım şirketiyle doğrudan sözleşme yapmak"], answer: 3 },
+		  { question: "Serbest olmayan tüketici, elektrik enerjisini hangi şirketten almak zorundadır?", options: ["İstediği tedarik şirketinden", "Görevli tedarik şirketinden", "İletim sisteminden", "Organize sanayi bölgesinden"], answer: 1 },
+		  { question: "Belirli süreli ikili anlaşmalar en fazla kaç yıl olabilir?", options: ["2 yıl", "3 yıl", "4 yıl", "5 yıl"], answer: 1 },
+		  { question: "İkili anlaşma sonrası tüketiciye hangi bilgi belgelerinin verilmesi zorunludur?", options: ["Sözlü bilgilendirme", "EK-1 ve EK-2 formları", "İmzalı fatura", "Tedarikçinin fiyat listesi"], answer: 1 },
+		  { question: "İkili anlaşmada tedarikçi tüketici aleyhine değişiklik yapmak istiyorsa en az kaç gün önceden bildirim yapmalıdır?", options: ["5 gün", "10 gün", "15 gün", "30 gün"], answer: 2 },
+		  { question: "Perakende satış sözleşmesinde tüketiciden aşağıdakilerden hangisi istenmez?", options: ["Ticaret sicil gazetesi", "İkametgah belgesi", "T.C. kimlik numarası", "Elektrik kullanılacak yerin adresi"], answer: 1 },
+		  { question: "Perakende satış sözleşmesi için güvence bedeli hangi durumda alınmaz?", options: ["Tüketicinin borcu yoksa", "Ön ödemeli sayaç kullanıyorsa", "100 kW altı bağlantı varsa", "Sözleşme ilk defa yapılıyorsa"], answer: 1 },
+		  { question: "Yönetmeliğin kapsamı aşağıdakilerden hangisini içermez?", options: ["Sayaç ve sayaca erişim", "Elektrik üretim tesislerinin lisanslandırılması", "Kaçak kullanım işlemleri", "Elektriğin kesilmesi ve bağlanması"], answer: 1 },
+		  { question: "Aşağıdakilerden hangisi 'güvence bedeli' tanımına girmez?", options: ["Tüketicinin ödeme yapmaması riskine karşı alınan bedel", "Kurul tarafından belirlenen bedel", "Elektrik üretim şirketinden alınan bedel", "İkili anlaşmada belirtilen ödeme teminatı"], answer: 2 },
+		  { question: "Serbest olmayan tüketiciler elektrik tedarikini nasıl sağlar?", options: ["İkili anlaşma ile", "Herhangi bir tedarikçiden", "Görevli tedarik şirketiyle perakende satış sözleşmesi yaparak", "Organize sanayi bölgesi vasıtasıyla"], answer: 2 },
+		  { question: "Tüketimi düşük serbest tüketici ikili anlaşmadan kaç gün içinde cayabilir?", options: ["7 gün", "14 gün", "30 gün", "5 iş günü"], answer: 1 },
+		  { question: "İkili anlaşma ile ilgili hangi ifade doğrudur?", options: ["Tüketicinin susması kabul anlamına gelir.", "Belirsiz süreli anlaşmalar yapılamaz.", "Tedarikçi EK-1 ve EK-2 formları ile bilgilendirme yapmak zorundadır.", "Sözleşme yalnızca kâğıt üzerinde yapılabilir."], answer: 2 },
+		  { question: "Perakende satış sözleşmesi kapsamında tüketici hangi yollarla başvuru yapabilir?", options: ["Sadece yazılı olarak", "İnternet üzerinden veya telefonla", "Sadece şirket merkezinden", "Sadece noter yoluyla"], answer: 1 },
+		  { question: "Tüketicinin gerçeğe aykırı beyanda bulunduğu tespit edilirse ne olur?", options: ["Ceza uygulanır", "Elektriği kesilir", "Sözleşmesi iptal edilir", "Yeni sözleşme yapılır"], answer: 2 },
+		];
+
+        let currentQuestion = 0;
+        let score = 0;
+        const questionEl = document.getElementById("question");
+        const optionsEl = document.getElementById("options");
+        const resultEl = document.getElementById("result");
+        const nextBtn = document.getElementById("nextBtn");
+        const scoreBox = document.getElementById("scoreBox");
+
+        function loadQuestion() {
+            const allNavItems = document.querySelectorAll('#questionList li');
+            allNavItems.forEach((item, idx) => {
+                item.classList.remove('active');
+                if (idx === currentQuestion) {
+                    item.classList.add('active');
+                }
+            });
+
+            const questionList = document.getElementById("questionList");
+            if (questionList && questionList.children.length === 0) {
+                questions.forEach((q, i) => {
+                    const li = document.createElement("li");
+                    li.textContent = `Soru ${i + 1}`;
+                    li.onclick = () => {
+                        currentQuestion = i;
+                        loadQuestion();
+                    };
+                    questionList.appendChild(li);
+                });
+            }
+
+            const q = questions[currentQuestion];
+            questionEl.textContent = `Soru ${currentQuestion + 1}: ${q.question}`;
+            optionsEl.innerHTML = "";
+            resultEl.textContent = "";
+            nextBtn.style.display = "none";
+            scoreBox.textContent = `Puan: ${score} / ${questions.length}`;
+
+            q.options.forEach((opt, index) => {
+                const li = document.createElement("li");
+                const btn = document.createElement("button");
+                btn.textContent = `${harfler[index]}) ${opt}`;
+                btn.onclick = () => checkAnswer(index, btn);
+                li.appendChild(btn);
+                optionsEl.appendChild(li);
+            });
+        }
+
+        function checkAnswer(selected, btnClicked) {
+            const q = questions[currentQuestion];
+            const buttons = document.querySelectorAll(".options button");
+
+            buttons.forEach((btn, idx) => {
+                btn.disabled = true;
+                btn.classList.remove("correct", "incorrect");
+                if (idx === q.answer) {
+                    btn.classList.add("correct");
+                }
+            });
+
+            if (selected === q.answer) {
+                score++;
+                resultEl.textContent = "Doğru cevap!";
+                resultEl.className = "result correct";
+            } else {
+                resultEl.textContent = "Yanlış cevap.";
+                resultEl.className = "result incorrect";
+                btnClicked.classList.add("incorrect");
+            }
+
+            nextBtn.style.display = "inline-block";
+            scoreBox.textContent = `Puan: ${score} / ${questions.length}`;
+        }
+
+        nextBtn.onclick = () => {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+            } else {
+                questionEl.textContent = "Test tamamlandı!";
+                optionsEl.innerHTML = "";
+                nextBtn.style.display = "none";
+                resultEl.textContent = `Tebrikler! ${score} / ${questions.length} doğru cevap verdiniz.`;
+                resultEl.className = "result correct";
+            }
+        };
+
+        loadQuestion();
+    </script>
+</body>
+
+</html>

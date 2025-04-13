@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>rA | Elektrik Dağıtım Şirketleri Denetim Yönetmeliği Testi</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(120deg, #f0f4f8, #d9e2ec);
+            margin: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-bottom: 20px;
+        }
+
+		.quiz-container {
+			background: #ffffff;
+			padding: 50px;
+			border-radius: 24px;
+			box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+			max-width: 100%;
+			width: 70%;  /* PC'de genişliği %70 yapıyoruz */
+			box-sizing: border-box;
+			margin: 20px;
+			margin-left: 20%;  /* Sol taraftan %10 boşluk bırakarak sağa kaydırıyoruz */
+		}
+
+        .question {
+            font-size: 24px;
+            margin-bottom: 30px;
+            font-weight: 600;
+            color: #102a43;
+            text-align: center;
+        }
+
+        .options {
+            list-style: none;
+            padding: 0;
+        }
+
+        .options li {
+            margin-bottom: 18px;
+        }
+
+        .options button {
+            width: 100%;
+            text-align: left;
+            background: #e3ebf6;
+            border: none;
+            border-radius: 10px;
+            padding: 16px 24px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        .options button:hover {
+            background: #c7d7ea;
+            transform: scale(1.01);
+        }
+
+        .options button.correct {
+            background-color: #38a169 !important;
+            color: white;
+            font-weight: bold;
+        }
+
+        .options button.incorrect {
+            background-color: #e53e3e !important;
+            color: white;
+            font-weight: bold;
+        }
+
+        .result {
+            margin-top: 30px;
+            font-weight: bold;
+            font-size: 20px;
+            text-align: center;
+        }
+
+        .result.correct {
+            color: green;
+        }
+
+        .result.incorrect {
+            color: red;
+        }
+
+        #nextBtn {
+            margin-top: 35px;
+            background: #2b6cb0;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: none;
+            float: right;
+        }
+
+        #nextBtn:hover {
+            background: #2c5282;
+        }
+
+        #scoreBox {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: #2b6cb0;
+        }
+
+        footer {
+            margin-top: 60px;
+            text-align: center;
+            font-size: 15px;
+            color: #555;
+        }
+
+		.question-navigation {
+			position: fixed;
+			left: 0;
+			top: 0;
+			bottom: 0;
+			width: 140px; /* Genişliği küçülttük */
+			overflow-y: auto;
+			background: #e2e8f0;
+			padding: 20px;
+			box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+			z-index: 1;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: flex-start;
+		}
+
+		.question-navigation a,
+		.question-navigation h3 {
+			text-align: center; /* Link ve başlıkları ortalar */
+			width: 100%;
+		}
+
+		.question-navigation a {
+			text-decoration: none;
+			font-size: 18px;
+			margin-bottom: 20px;
+			color: white;  /* Yazı rengini beyaz yapalım */
+			background-color: #38a169;  /* Yeşil arka plan rengi */
+			padding: 10px 20px;  /* Düğmeye biraz iç boşluk ekleyelim */
+			border-radius: 8px;  /* Kenarlarını yuvarlayalım */
+			font-weight: bold;
+			display: block;  /* Linkin tüm alanını tıklanabilir yapar */
+			text-align: center;  /* Yazıyı ortalar */
+			transition: background-color 0.3s ease;  /* Hover efekti eklerken yumuşak geçiş sağlar */
+		}
+
+		.question-navigation h3 {
+			font-size: 18px;
+			margin-bottom: 10px;
+		}
+
+        .question-navigation a:hover {
+            background-color: #2f855a;
+        }
+
+        .question-list {
+            padding-left: 20px;
+            font-size: 14px;
+            line-height: 1.6;
+            list-style: none;
+        }
+
+        .question-list li {
+            background: white;
+            padding: 6px 10px;
+            border-radius: 6px;
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            margin-bottom: 6px;
+        }
+
+        .question-list li.active {
+            font-weight: bold;
+            color: #2b6cb0;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+                overflow-y: auto;
+                align-items: flex-start;
+                padding: 20px;
+            }
+
+            .quiz-container {
+                margin-left: 0 !important;
+                margin-top: 20px;
+                padding: 24px;
+                width: 100%;
+                max-width: 100%;
+            }
+
+			.question-navigation {
+				position: static;
+				width: 100%;  /* Mobil görünümde genişlik %100 olacak */
+				box-shadow: none;
+				margin-bottom: 20px;
+				padding: 10px;
+				margin-top: 10px;
+			}
+
+            .question-navigation a {
+                width: auto;
+                padding: 8px 16px;
+                font-size: 16px;
+            }
+
+            .question-list {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 6px;
+                padding-left: 0;
+                justify-content: center;
+            }
+
+            .question-list li {
+                flex: 0 0 auto;
+                font-size: 14px;
+                padding: 6px 10px;
+                border-radius: 6px;
+                box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+                cursor: pointer;
+            }
+
+            .question-list li.active {
+                font-weight: bold;
+                color: #2b6cb0;
+            }
+
+            .question {
+                font-size: 20px;
+            }
+
+            .options button {
+                font-size: 16px;
+                padding: 12px 18px;
+            }
+
+            #nextBtn {
+                float: none;
+                display: block;
+                margin: 30px auto 0 auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .question-navigation {
+                width: 100%;
+                padding: 8px;
+            }
+
+            .question-navigation a {
+                font-size: 14px;
+                padding: 8px 12px;
+            }
+
+            .options button {
+                font-size: 14px;
+                padding: 12px;
+            }
+
+            .question {
+                font-size: 18px;
+            }
+
+            #nextBtn {
+                padding: 12px 24px;
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="question-navigation">
+        <a href="index.html">Ana Sayfa</a>
+        <h3>Tüm Sorular</h3>
+        <ol id="questionList" class="question-list"></ol>
+    </div>
+
+    <div class="quiz-container">
+        <div id="quiz">
+            <div class="question" id="question"></div>
+            <ul class="options" id="options"></ul>
+            <button id="nextBtn" type="button">Sonraki Soru</button>
+            <div class="result" id="result"></div>
+            <div id="scoreBox"></div>
+        </div>
+        <footer>
+            Bu test <strong>Elektrik Dağıtım Şirketleri Denetim Yönetmeliği</strong> temel alınarak hazırlanmıştır.<br />
+            [ ramazan.bozkurt@tedas.gov.tr ]
+        </footer>
+    </div>
+
+    <script>
+        const harfler = ["A", "B", "C", "D"];
+		const questions = [
+		  { question: "Yönetmeliğin amacı aşağıdakilerden hangisidir?", options: ["Elektrik üretim tesislerinin ruhsatlandırılması", "Enerji piyasasında ithalat-ihraç izinlerinin belirlenmesi", "Elektrik enerjisinin kaliteli, sürekli, düşük maliyetli ve çevreyle uyumlu sunulması", "Lisanssız elektrik üretimi esaslarının belirlenmesi"], answer: 2 },
+		  { question: "Yönetmelik hangi kanunlara dayanmaktadır?", options: ["4628 ve 6446 sayılı kanunlar", "4703 ve 5015 sayılı kanunlar", "4046 ve 6102 sayılı kanunlar", "5549 ve 6502 sayılı kanunlar"], answer: 0 },
+		  { question: "Aşağıdakilerden hangisi TSKS sisteminin görevidir?", options: ["Sayaçlardan uzaktan veri çekmek", "SCADA sistemini yönetmek", "Kesinti bilgilerini kaydedip analiz etmek", "Tarife hesaplarını yapmak"], answer: 2 },
+		  { question: "\"Uzun kesinti\" tanımı aşağıdakilerden hangisidir?", options: ["1 saniyeden fazla, 3 dakikadan kısa", "3 dakikadan uzun", "1 dakikadan fazla, 10 dakikadan az", "10 dakikadan fazla"], answer: 1 },
+		  { question: "Elektrik dağıtım sisteminde kalite hangi başlık altında izlenir?", options: ["Ekonomik ve Teknik", "Dağıtım ve Üretim", "Dağıtım kalitesi ve perakende satış kalitesi", "Ticari kalite ve sayaç okuma kalitesi"], answer: 2 },
+		  { question: "Kesintinin bildirimsiz sayılması için ne gereklidir?", options: ["TSUİS'ten tespit edilmesi", "Kullanıcıya 48 saat önceden haber verilmemesi", "Arıza bildirilmemesi", "1 saatten az sürmesi"], answer: 1 },
+		  { question: "Aşağıdakilerden hangisi kesinti sebebi olarak KABUL EDİLMEZ?", options: ["Mücbir sebep", "Güvenlik", "Mevsimsel hava", "Şebeke işletmecisi"], answer: 2 },
+		  { question: "Kesinti sınıflandırmasında aşağıdakilerden hangisi YER ALMAZ?", options: ["Kaynağına göre", "Süresine göre", "Gecikme türüne göre", "Sebebine göre"], answer: 2 },
+		  { question: "OKSÜRE göstergesi neyi ifade eder?", options: ["Ortalama kullanıcı sayısı", "Ortalama kesinti süresi", "Kullanıcılara ödenen tazminat miktarı", "Dağıtılmayan enerji miktarı"], answer: 1 },
+		  { question: "Uzun süreli kesinti tazminatı hangi bölgede 12 saatten sonra doğar?", options: ["Kentsel", "Kentaltı", "Kırsal", "Organize sanayi"], answer: 2 },
+		  { question: "Ticari kalite kapsamında kullanıcı başvuruları kaç ana kanaldan kabul edilmelidir?", options: ["1", "2", "3", "5"], answer: 2 },
+		  { question: "Ticari kalite verileri hangi tarihe kadar Kuruma sunulmalıdır?", options: ["31 Aralık", "31 Ocak", "31 Mart", "30 Haziran"], answer: 1 },
+		  { question: "Dağıtım şirketi, kullanıcı başvurularına ait kayıtları hangi tabloda Kuruma bildirir?", options: ["Tablo 1", "Tablo 4", "Tablo 7-B", "Tablo 9-A"], answer: 2 },
+		  { question: "Dağıtım şirketi ticari kalite verilerini hangi araçla kamuya açıklar?", options: ["Resmî Gazete", "Kurum web sitesi", "Kendi internet sitesi", "Sosyal medya"], answer: 2 },
+		  { question: "Teknik kalite değerlendirmeleri hangi sistem üzerinden yapılır?", options: ["TSKS", "OSOS", "SCADA", "EDVARS"], answer: 1 },
+		  { question: "Teknik kalite göstergeleri en az kaç kullanıcı için OSOS verileriyle hesaplanmalıdır?", options: ["500", "1000", "3000", "5000"], answer: 2 },
+		  { question: "Kullanıcının tazminat talebi süresi nedir?", options: ["10 gün", "20 gün", "30 gün", "60 gün"], answer: 2 },
+		  { question: "Tazminat başvurusu sonrası onarım süresi kaç gündür?", options: ["3", "5", "10", "15"], answer: 3 },
+		  { question: "Kullanıcıya ödeme yapılacaksa, ödeme fatura tarihinden itibaren kaç iş günü içinde tamamlanmalıdır?", options: ["3", "5", "7", "10"], answer: 1 },
+		  { question: "Yıllık kesinti tazminat bildirimleri kullanıcılara ne zaman yapılmalıdır?", options: ["Ocak sonu", "Mart sonu", "Nisan sonu", "Haziran sonu"], answer: 2 },
+		  { question: "Kullanıcı ödeme şeklini bildirmezse, en geç hangi tarihe kadar bildirebilir?", options: ["28 Şubat", "31 Mart", "30 Nisan", "31 Mayıs"], answer: 1 },
+		  { question: "Yıllık bakım raporu en geç hangi tarihe kadar Kuruma sunulmalıdır?", options: ["30 Nisan", "31 Mayıs", "30 Haziran", "31 Temmuz"], answer: 2 },
+		  { question: "Genel kalite raporu hangi yılı kapsar?", options: ["Güncel yıl", "Önceki yıl", "Son üç yıl", "Beş yıllık dönem"], answer: 1 },
+		  { question: "Perakende satış kalitesi sorumluluğu kimdedir?", options: ["EPDK", "Tüketici", "Görevli tedarik şirketi", "Dağıtım şirketi"], answer: 2 },
+		  { question: "Görevli tedarik şirketi kullanıcı başvurularını kaç kanaldan almak zorundadır?", options: ["1", "2", "3", "4"], answer: 2 },
+		  { question: "Perakende satış kalite göstergeleri hangi tarihte Kuruma sunulur?", options: ["31 Ocak", "28 Şubat", "30 Nisan", "30 Haziran"], answer: 0 }
+		];
+
+        let currentQuestion = 0;
+        let score = 0;
+        const questionEl = document.getElementById("question");
+        const optionsEl = document.getElementById("options");
+        const resultEl = document.getElementById("result");
+        const nextBtn = document.getElementById("nextBtn");
+        const scoreBox = document.getElementById("scoreBox");
+
+        function loadQuestion() {
+            const allNavItems = document.querySelectorAll('#questionList li');
+            allNavItems.forEach((item, idx) => {
+                item.classList.remove('active');
+                if (idx === currentQuestion) {
+                    item.classList.add('active');
+                }
+            });
+
+            const questionList = document.getElementById("questionList");
+            if (questionList && questionList.children.length === 0) {
+                questions.forEach((q, i) => {
+                    const li = document.createElement("li");
+                    li.textContent = `Soru ${i + 1}`;
+                    li.onclick = () => {
+                        currentQuestion = i;
+                        loadQuestion();
+                    };
+                    questionList.appendChild(li);
+                });
+            }
+
+            const q = questions[currentQuestion];
+            questionEl.textContent = `Soru ${currentQuestion + 1}: ${q.question}`;
+            optionsEl.innerHTML = "";
+            resultEl.textContent = "";
+            nextBtn.style.display = "none";
+            scoreBox.textContent = `Puan: ${score} / ${questions.length}`;
+
+            q.options.forEach((opt, index) => {
+                const li = document.createElement("li");
+                const btn = document.createElement("button");
+                btn.textContent = `${harfler[index]}) ${opt}`;
+                btn.onclick = () => checkAnswer(index, btn);
+                li.appendChild(btn);
+                optionsEl.appendChild(li);
+            });
+        }
+
+        function checkAnswer(selected, btnClicked) {
+            const q = questions[currentQuestion];
+            const buttons = document.querySelectorAll(".options button");
+
+            buttons.forEach((btn, idx) => {
+                btn.disabled = true;
+                btn.classList.remove("correct", "incorrect");
+                if (idx === q.answer) {
+                    btn.classList.add("correct");
+                }
+            });
+
+            if (selected === q.answer) {
+                score++;
+                resultEl.textContent = "Doğru cevap!";
+                resultEl.className = "result correct";
+            } else {
+                resultEl.textContent = "Yanlış cevap.";
+                resultEl.className = "result incorrect";
+                btnClicked.classList.add("incorrect");
+            }
+
+            nextBtn.style.display = "inline-block";
+            scoreBox.textContent = `Puan: ${score} / ${questions.length}`;
+        }
+
+        nextBtn.onclick = () => {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+            } else {
+                questionEl.textContent = "Test tamamlandı!";
+                optionsEl.innerHTML = "";
+                nextBtn.style.display = "none";
+                resultEl.textContent = `Tebrikler! ${score} / ${questions.length} doğru cevap verdiniz.`;
+                resultEl.className = "result correct";
+            }
+        };
+
+        loadQuestion();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>rA | Taşınmaz Teminine İlişkin Usul ve Esaslar Testi</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(120deg, #f0f4f8, #d9e2ec);
+            margin: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-bottom: 20px;
+        }
+
+		.quiz-container {
+			background: #ffffff;
+			padding: 50px;
+			border-radius: 24px;
+			box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+			max-width: 100%;
+			width: 70%;  /* PC'de genişliği %70 yapıyoruz */
+			box-sizing: border-box;
+			margin: 20px;
+			margin-left: 20%;  /* Sol taraftan %10 boşluk bırakarak sağa kaydırıyoruz */
+		}
+
+        .question {
+            font-size: 24px;
+            margin-bottom: 30px;
+            font-weight: 600;
+            color: #102a43;
+            text-align: center;
+        }
+
+        .options {
+            list-style: none;
+            padding: 0;
+        }
+
+        .options li {
+            margin-bottom: 18px;
+        }
+
+        .options button {
+            width: 100%;
+            text-align: left;
+            background: #e3ebf6;
+            border: none;
+            border-radius: 10px;
+            padding: 16px 24px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        .options button:hover {
+            background: #c7d7ea;
+            transform: scale(1.01);
+        }
+
+        .options button.correct {
+            background-color: #38a169 !important;
+            color: white;
+            font-weight: bold;
+        }
+
+        .options button.incorrect {
+            background-color: #e53e3e !important;
+            color: white;
+            font-weight: bold;
+        }
+
+        .result {
+            margin-top: 30px;
+            font-weight: bold;
+            font-size: 20px;
+            text-align: center;
+        }
+
+        .result.correct {
+            color: green;
+        }
+
+        .result.incorrect {
+            color: red;
+        }
+
+        #nextBtn {
+            margin-top: 35px;
+            background: #2b6cb0;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: none;
+            float: right;
+        }
+
+        #nextBtn:hover {
+            background: #2c5282;
+        }
+
+        #scoreBox {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: #2b6cb0;
+        }
+
+        footer {
+            margin-top: 60px;
+            text-align: center;
+            font-size: 15px;
+            color: #555;
+        }
+
+		.question-navigation {
+			position: fixed;
+			left: 0;
+			top: 0;
+			bottom: 0;
+			width: 140px; /* Genişliği küçülttük */
+			overflow-y: auto;
+			background: #e2e8f0;
+			padding: 20px;
+			box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+			z-index: 1;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: flex-start;
+		}
+
+		.question-navigation a,
+		.question-navigation h3 {
+			text-align: center; /* Link ve başlıkları ortalar */
+			width: 100%;
+		}
+
+		.question-navigation a {
+			text-decoration: none;
+			font-size: 18px;
+			margin-bottom: 20px;
+			color: white;  /* Yazı rengini beyaz yapalım */
+			background-color: #38a169;  /* Yeşil arka plan rengi */
+			padding: 10px 20px;  /* Düğmeye biraz iç boşluk ekleyelim */
+			border-radius: 8px;  /* Kenarlarını yuvarlayalım */
+			font-weight: bold;
+			display: block;  /* Linkin tüm alanını tıklanabilir yapar */
+			text-align: center;  /* Yazıyı ortalar */
+			transition: background-color 0.3s ease;  /* Hover efekti eklerken yumuşak geçiş sağlar */
+		}
+
+		.question-navigation h3 {
+			font-size: 18px;
+			margin-bottom: 10px;
+		}
+
+        .question-navigation a:hover {
+            background-color: #2f855a;
+        }
+
+        .question-list {
+            padding-left: 20px;
+            font-size: 14px;
+            line-height: 1.6;
+            list-style: none;
+        }
+
+        .question-list li {
+            background: white;
+            padding: 6px 10px;
+            border-radius: 6px;
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            margin-bottom: 6px;
+        }
+
+        .question-list li.active {
+            font-weight: bold;
+            color: #2b6cb0;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+                overflow-y: auto;
+                align-items: flex-start;
+                padding: 20px;
+            }
+
+            .quiz-container {
+                margin-left: 0 !important;
+                margin-top: 20px;
+                padding: 24px;
+                width: 100%;
+                max-width: 100%;
+            }
+
+			.question-navigation {
+				position: static;
+				width: 100%;  /* Mobil görünümde genişlik %100 olacak */
+				box-shadow: none;
+				margin-bottom: 20px;
+				padding: 10px;
+				margin-top: 10px;
+			}
+
+            .question-navigation a {
+                width: auto;
+                padding: 8px 16px;
+                font-size: 16px;
+            }
+
+            .question-list {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 6px;
+                padding-left: 0;
+                justify-content: center;
+            }
+
+            .question-list li {
+                flex: 0 0 auto;
+                font-size: 14px;
+                padding: 6px 10px;
+                border-radius: 6px;
+                box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+                cursor: pointer;
+            }
+
+            .question-list li.active {
+                font-weight: bold;
+                color: #2b6cb0;
+            }
+
+            .question {
+                font-size: 20px;
+            }
+
+            .options button {
+                font-size: 16px;
+                padding: 12px 18px;
+            }
+
+            #nextBtn {
+                float: none;
+                display: block;
+                margin: 30px auto 0 auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .question-navigation {
+                width: 100%;
+                padding: 8px;
+            }
+
+            .question-navigation a {
+                font-size: 14px;
+                padding: 8px 12px;
+            }
+
+            .options button {
+                font-size: 14px;
+                padding: 12px;
+            }
+
+            .question {
+                font-size: 18px;
+            }
+
+            #nextBtn {
+                padding: 12px 24px;
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="question-navigation">
+        <a href="index.html">Ana Sayfa</a>
+        <h3>Tüm Sorular</h3>
+        <ol id="questionList" class="question-list"></ol>
+    </div>
+
+    <div class="quiz-container">
+        <div id="quiz">
+            <div class="question" id="question"></div>
+            <ul class="options" id="options"></ul>
+            <button id="nextBtn" type="button">Sonraki Soru</button>
+            <div class="result" id="result"></div>
+            <div id="scoreBox"></div>
+        </div>
+        <footer>
+            Bu test <strong>Taşınmaz Teminine İlişkin Usul ve Esaslar</strong> temel alınarak hazırlanmıştır.<br />
+            [ ramazan.bozkurt@tedas.gov.tr ]
+        </footer>
+    </div>
+
+    <script>
+        const harfler = ["A", "B", "C", "D"];
+        const questions = [
+		  { question: "TEDAŞ Taşınmaz Teminine İlişkin Usul ve Esaslar’ın amacı nedir?", options: ["Elektrik üretim tesislerini özelleştirmek", "Dağıtım tesislerinin bakımını yürütmek", "Taşınmaz temin işlemlerini standardize etmek", "İletim hatlarını denetlemek"], answer: 2 },
+		  { question: "Usul ve Esaslar hangi birimleri kapsar?", options: ["Sadece TEDAŞ Merkez", "TEDAŞ Merkez ve Taşra Birimleri ile Lisanslı Dağıtım Şirketleri", "Sadece Taşra Birimi", "Yalnızca özel sektör"], answer: 1 },
+		  { question: "Bu Usul ve Esaslar hangi kanunlara dayanılarak hazırlanmıştır?", options: ["Borçlar Kanunu", "2942 Sayılı Kamulaştırma Kanunu ve 6446 Sayılı Elektrik Piyasası Kanunu", "İmar Kanunu", "Maden Kanunu"], answer: 1 },
+		  { question: "Büyük Ova Koruma Alanı Tarım Dışı Kullanım İzni hangi kanuna dayanır?", options: ["6831 Sayılı Orman Kanunu", "5403 Sayılı Toprak Koruma ve Arazi Kullanımı Kanunu", "2942 Sayılı Kamulaştırma Kanunu", "6360 Sayılı Belediye Kanunu"], answer: 1 },
+		  { question: "‘Hak tesisi’ kavramı aşağıdakilerden hangisini içermez?", options: ["İrtifak hakkı tesisi", "Kiralama", "Tapu iptali", "Kullanma izni verilmesi"], answer: 2 },
+		  { question: "Kamulaştırma işlemleri hangi kurum tarafından yürütülür?", options: ["İlgili belediye", "EPDK", "TEDAŞ", "Tapu Müdürlüğü"], answer: 2 },
+		  { question: "Elektrik dağıtım tesislerinin kamulaştırma haritaları kim tarafından hazırlanır veya hazırlatılır?", options: ["Bakanlık", "Belediye", "Şirket", "TEDAŞ"], answer: 2 },
+		  { question: "İmar planında yer tahsisi hangi aşamada sağlanır?", options: ["Tescil sonrası", "Tapu devrinden sonra", "Yönetim Kurulu kararı öncesinde", "Kamulaştırma davasından sonra"], answer: 2 },
+		  { question: "Kamulaştırma harita ve plan dosyası ilk olarak kime gönderilir?", options: ["Merkez Birimi", "Bakanlık", "Tapu Müdürlüğü", "Taşra Birimi"], answer: 3 },
+		  { question: "Acele kamulaştırma talebi varsa bu kim aracılığıyla değerlendirilir?", options: ["Şirket", "Cumhurbaşkanlığı", "Merkez Birimi", "Belediye"], answer: 2 },
+		  { question: "Cumhurbaşkanlığı kararı ile yapılan acele kamulaştırmalarda dava açma sürecini kim başlatır?", options: ["Belediye", "Şirket", "Taşra Birimi", "Merkez Birimi"], answer: 3 },
+		  { question: "Kıymet takdir raporlarını hazırlayan komisyon en az kaç kişiden oluşmalıdır?", options: ["2", "3", "4", "5"], answer: 1 },
+		  { question: "Arazi niteliğindeki taşınmazların değerlemesinde hangi mühendisler görev alır?", options: ["Ziraat ve harita mühendisi", "İnşaat ve elektrik mühendisi", "Makine ve inşaat mühendisi", "Jeoloji ve harita mühendisi"], answer: 0 },
+		  { question: "TAKPAS üzerinden hangi bilgi tespit edilir?", options: ["Adres bilgileri", "İmar durumu", "Taşınmazın sahibi", "Tapu harcı"], answer: 2 },
+		  { question: "MERNİS üzerinden hangi bilgi temin edilir?", options: ["Kadastro paftası", "Şirket bilgileri", "Adres bilgileri", "Tapu tescil belgesi"], answer: 2 },
+		  { question: "Uzlaşma görüşmeleri için çağrı bildirimleri kim tarafından hazırlanır?", options: ["Taşra Birimi", "Şirket", "Belediye", "Merkez Birim"], answer: 1 },
+		  { question: "Uzlaşma görüşmeleri sırasında yer temini ve güvenlik önlemleri kim tarafından sağlanır?", options: ["TEDAŞ", "Belediye", "Şirket", "Taşra Birimi"], answer: 2 },
+		  { question: "Tescil işlemi hangi kurum adına yapılır?", options: ["TEDAŞ", "Şirket", "Belediye", "EPDK"], answer: 0 },
+		  { question: "Uzlaşma sağlanamayan maliklerle ilgili davayı kim hazırlar?", options: ["Tapu müdürlüğü", "Şirket", "TEDAŞ", "Belediye"], answer: 1 },
+		  { question: "Taşınmaz bedellerinin tescili gerçekleştirilen maliklere ödenmesi için kim bilgilendirilir?", options: ["Belediye", "Şirket", "Merkez Birim", "Kadastro Müdürü"], answer: 1 },
+		  { question: "Kamulaştırma harita ve planları hangi teknik dokümana göre hazırlanmalıdır?", options: ["İmar Planı Talimatnamesi", "Kamulaştırma ve Değerleme El Kitabı", "TEDAŞ Teknik Şartnamesi", "Belediye Yapı Yönetmeliği"], answer: 2 },
+		  { question: "Taşra Birimi hangi dosyaları kontrol eder ve gerekirse iade eder?", options: ["Proje fizibilite raporları", "Elektrik bağlantı projeleri", "Kamulaştırma harita ve plan dosyası", "Yatırım izin belgeleri"], answer: 2 },
+		  { question: "Acele kamulaştırma gerekçesiyle beraber hangi kuruma yazı ile başvurulur?", options: ["Belediye", "Merkez Birimi", "Enerji Bakanlığı", "Şirket"], answer: 1 },
+		  { question: "Kıymet takdir raporları hangi sürede Şirket tarafından hazırlanmalıdır?", options: ["5 iş günü", "10 iş günü", "20 iş günü", "30 iş günü"], answer: 2 },
+		  { question: "Taşra Birimi, emlak ve kamulaştırma servisi raporları kaç gün içinde incelemelidir?", options: ["5 iş günü", "10 iş günü", "15 iş günü", "20 iş günü"], answer: 1 },
+		  { question: "Cumhurbaşkanı Kararının yayımlanmasından sonra dava açma oluru kim tarafından verilir?", options: ["Belediye Başkanı", "TEDAŞ Genel Müdürü", "Merkez Birimi", "Enerji Bakanı"], answer: 2 },
+		  { question: "Acele el koyma davalarının harç ve masrafları kim tarafından karşılanır?", options: ["Şirket", "Taşra Birimi", "Bakanlık", "TEDAŞ"], answer: 0 },
+		  { question: "Acele kamulaştırma kararları hangi resmi makam tarafından alınır?", options: ["Cumhurbaşkanlığı", "Enerji Bakanlığı", "TEDAŞ", "EPDK"], answer: 0 },
+		  { question: "Taşra Birimi uzlaşma komisyonu en az kaç kişiden oluşur?", options: ["2", "3", "5", "6"], answer: 1 },
+		  { question: "Kıymet takdir komisyonu arazi niteliğinde taşınmaz için hangi mühendisleri içerir?", options: ["Jeoloji ve harita", "Harita ve ziraat", "İnşaat ve elektrik", "Ziraat ve makine"], answer: 1 },
+		  { question: "Adres tespiti yapılamayan malikler için hangi yöntem uygulanır?", options: ["Zorla çağırma", "Emniyete bildirme", "Mahalle muhtarına bildirim", "İlanen tebligat"], answer: 3 },
+		  { question: "Uzlaşma görüşmelerine katılmayan maliklere ilişkin davayı hangi kurum açar?", options: ["Şirket", "Taşra Birimi", "Merkez Birimi", "Bakanlık"], answer: 1 },
+		  { question: "TEDAŞ adına tescil işlemlerini kim takip eder?", options: ["Belediye", "Kadastro Müdürlüğü", "Şirket ve Taşra Birimi", "Merkez Birimi"], answer: 2 },
+		  { question: "Kamulaştırma bedelleri hangi süre içinde ödenmelidir?", options: ["3 iş günü", "5 iş günü", "7 iş günü", "10 iş günü"], answer: 1 },
+		  { question: "Şirketin talebi ile taşınmazın kamulaştırılması işlemi kimin arşivinden araştırılır?", options: ["EPDK", "Belediye", "Şirket ve Taşra Birimi", "Kadastro Müdürlüğü"], answer: 2 },
+		  { question: "İmar planı dahilindeki yerlerin tahsisi ne zaman tamamlanır?", options: ["Kamulaştırma sonrası", "Uzlaşma sonrası", "Yönetim Kurulu kararı öncesinde", "Tescil işleminden sonra"], answer: 2 },
+		  { question: "TEDAŞ adına tescil işlemlerinden sonra hangi birime bildirim yapılır?", options: ["Mali İşler Dairesi", "Tapu Müdürlüğü", "Ziraat Odası", "İçişleri Bakanlığı"], answer: 0 },
+		  { question: "Kamulaştırma işlemleri sırasında karşılaşılan diğer giderler kim tarafından ödenir?", options: ["Valilik", "EPDK", "Şirket", "TEDAŞ"], answer: 2 },
+		  { question: "Tescil edilen taşınmazların kaydı hangi deftere işlenir?", options: ["Muhasebe Bütçe Defteri", "Sabit Kıymetler Defteri", "Zimmet Defteri", "Tapu Paylaşım Defteri"], answer: 1 },
+		  { question: "Tescil taleplerinin izlenmesinden kim sorumludur?", options: ["Belediye", "Şirket ve Taşra Birimi", "TEDAŞ Hukuk Servisi", "Enerji Bakanlığı"], answer: 1 },
+		  { question: "Hazine dışındaki kamu taşınmazlarının devir planları kim tarafından hazırlanır?", options: ["Belediye", "Kadastro Müdürlüğü", "Şirket", "Merkez Birimi"], answer: 2 },
+		  { question: "İmar planında yer tahsis işlemleri hangi durumda Yönetim Kurulu sonrası tamamlanabilir?", options: ["Belediye itiraz ettiğinde", "Muvafakat istenmesi halinde", "Plan askıda kaldığında", "Şirket talep ettiğinde"], answer: 1 },
+		  { question: "Devir işlemine esas harita ve plan dosyası ilk olarak nereye gönderilir?", options: ["Belediye", "Merkez Birimi", "Tapu Müdürlüğü", "Taşra Birimi"], answer: 3 },
+		  { question: "Büyük Ova Koruma Alanı içinde kalan taşınmazlar için izin dosyasını kim hazırlar?", options: ["Belediye", "Şirket", "TEDAŞ", "Enerji Bakanlığı"], answer: 1 },
+		  { question: "Yönetim Kurulu kararı sonrası alınan devir kararları hangi kuruma iletilir?", options: ["Şirket", "Bakanlık", "Taşra Birimi", "EPDK"], answer: 2 },
+		  { question: "Kadastro kontrol ve onay işlemleri kim tarafından takip edilir?", options: ["Taşra Birimi", "Şirket", "Kadastro Müdürlüğü", "Merkez Birimi"], answer: 1 },
+		  { question: "Devir işlemleri kapsamında kıymet takdir komisyonunu kim görevlendirir?", options: ["EPDK", "Şirket", "TEDAŞ", "Taşra Birimi"], answer: 3 },
+		  { question: "Devir kıymet raporları hangi mühendislerce onaylanır?", options: ["Elektrik ve makine mühendisi", "Ziraat ve harita / İnşaat ve harita mühendisi", "Harita ve endüstri mühendisi", "İnşaat ve jeoloji mühendisi"], answer: 1 },
+		  { question: "Devir işlemi için taşınmaz maliki kurumdan muvafakat talebi hangi maddeye göre yapılır?", options: ["Kamulaştırma Kanunu 27", "Kamulaştırma Kanunu 10", "Kamulaştırma Kanunu 30", "Toprak Koruma Kanunu 14"], answer: 2 },
+		  { question: "Tescil talepleri hangi kurumlarca takip edilir?", options: ["Şirket ve Taşra Birimi", "Belediye ve EPDK", "Kadastro ve Tapu", "Merkez Birim ve Şirket"], answer: 0 },
+		  { question: "Devir işlemine muvafakat verilmemesi halinde hangi mahkemelerde dava açılır?", options: ["Sulh Hukuk Mahkemesi", "Asliye Hukuk Mahkemesi ve Danıştay", "İdare Mahkemesi", "Anayasa Mahkemesi"], answer: 1 },
+		  { question: "Devir işlemlerinde açılacak davaların masrafları kim tarafından ödenir?", options: ["Taşra Birimi", "Şirket", "EPDK", "TEDAŞ"], answer: 1 },
+		  { question: "Mahkeme kararı ile yapılan tescillerin belgeleri nereye gönderilir?", options: ["Bakanlık", "EPDK", "Taşra Birimi", "TEDAŞ Sabit Kıymetler Defterine"], answer: 3 },
+		  { question: "Devir işlemlerinden doğan giderler kim tarafından karşılanır?", options: ["Taşra Birimi", "Şirket", "TEDAŞ", "İlgili Bakanlık"], answer: 1 },
+		  { question: "Devletin hüküm ve tasarrufu altındaki taşınmazlar için harita ve planları kim hazırlar?", options: ["Kadastro Müdürlüğü", "TEDAŞ", "Şirket", "Taşra Birimi"], answer: 2 },
+		  { question: "Hak tesisi kararı hangi kurum tarafından alınır?", options: ["Belediye Meclisi", "Enerji Bakanlığı", "TEDAŞ Yönetim Kurulu", "Şirket"], answer: 2 },
+		  { question: "Yönetim Kurulu kararı hangi kurumlara iletilir?", options: ["Belediye ve Tapu", "Şirket ve Taşra Birimi", "Tapu ve MERNİS", "Kadastro ve Ziraat Odası"], answer: 1 },
+		  { question: "Hak tesisi işlemine dair bilgi ve belgeleri kim sağlar?", options: ["Merkez Birimi", "Taşra Birimi", "TEDAŞ", "Şirket"], answer: 3 },
+		  { question: "Hazine taşınmazlarına ait ödemeler ve giderler kim tarafından karşılanır?", options: ["Bakanlık", "Taşra Birimi", "Şirket", "TEDAŞ"], answer: 2 },
+		  { question: "Hak tesisi işlemi tamamlandıktan sonra belgeler nereye gönderilir?", options: ["Kadastro Müdürlüğü", "Mali İşler Dairesi", "Taşra Birimi", "Ziraat Odası"], answer: 2 },
+		  { question: "Orman izin işlemleri hangi kanunlara göre yürütülür?", options: ["5403 ve 2942 Sayılı Kanunlar", "2942 ve 6831 Sayılı Kanunlar", "6831 ve 2873 Sayılı Kanunlar", "2872 ve 3194 Sayılı Kanunlar"], answer: 2 },
+		  { question: "Orman izin dosyasını ilk olarak kim hazırlar veya hazırlatır?", options: ["Taşra Birimi", "TEDAŞ", "Belediye", "Şirket"], answer: 3 },
+		  { question: "Orman izin dosyası kontrol ve onay için kime gönderilir?", options: ["Orman Bakanlığı", "Taşra Birimi", "Merkez Birimi", "TEDAŞ"], answer: 1 },
+		  { question: "İzin başvurusu hangi kurum tarafından yapılır?", options: ["Şirket", "Belediye", "Taşra Birimi", "Enerji Bakanlığı"], answer: 2 },
+		  { question: "İzin oluru ve ekleri hangi kuruma iletilir?", options: ["EPDK", "Belediye", "Şirket", "Kadastro Müdürlüğü"], answer: 2 },
+		  { question: "İzin bedellerinin doğruluğunu kim kontrol eder?", options: ["Orman Müdürlüğü", "TEDAŞ", "Taşra Birimi", "Şirket"], answer: 3 },
+		  { question: "Orman sahası teslimini kim gerçekleştirir?", options: ["Kadastro ve Tapu", "Taşra Birimi veya Şirket", "EPDK", "TEDAŞ"], answer: 1 },
+		  { question: "Taahhüt senetlerinin 5 nüsha olarak imzalanmasından sonra 3 nüshası nereye gönderilir?", options: ["Kadastro Müdürlüğü", "İlgili orman idaresine", "Belediye", "Enerji Bakanlığı"], answer: 1 },
+		  { question: "İzin belgeleri arşiv kayıtları için nereye gönderilir?", options: ["Belediye", "Ziraat Odası", "TEDAŞ", "Şirket"], answer: 2 },
+		  { question: "Orman iznine dair yükümlülükler hangi süre boyunca şirkete aittir?", options: ["Tesis süresi boyunca", "İzin süresi boyunca", "Yıllık olarak", "İşletme Hakkı Devir Sözleşmesi süresince"], answer: 3 },
+		  { question: "Taşınmaz temin dosyasında hangi kapsam ayrımı yapılmaksızın talepte bulunulur?", options: ["Kadastral durum", "Mülkiyet türü", "İmar planı onayı", "Belediye sınırlaması"], answer: 1 },
+		  { question: "Taşınmaz tapularının temini bildirimi sonrası ödemeler kaç gün içinde yapılmalıdır?", options: ["3 iş günü", "5 iş günü", "7 iş günü", "10 iş günü"], answer: 1 },
+		  { question: "Kamulaştırma ve devir belgeleri hangi birimde saklanır?", options: ["TEDAŞ Hukuk", "Şirket", "Taşra Birimi", "Kadastro Müdürlüğü"], answer: 2 },
+		  { question: "TEDAŞ Kalite Yönetim Sisteminde kullanılan belgeler aşağıdakilerden hangisidir?", options: ["Resmi yazılar", "İmar planları", "Formlar, listeler vb. dokümanlar", "Defter kayıtları"], answer: 2 },
+		  { question: "Takip formlarını Merkez Birim talep ederse hangi işlem yapılır?", options: ["Saklanır", "Belediyeye iletilir", "Güncellenerek gönderilir", "Silinir"], answer: 2 },
+		  { question: "Taşra Birimi tarafından ödenmiş bir bedel şirkete nasıl iade edilir?", options: ["Mahkeme kararıyla", "Şifahi bildirimle", "Avans faizi ile 5 iş günü içinde", "Tescil sonrası"], answer: 2 },
+		  { question: "Usul ve Esaslarda yer almayan konularda kim karar verir?", options: ["Şirket", "Belediye", "Enerji Bakanlığı", "Merkez Birim"], answer: 3 },
+		  { question: "Yürürlükten kaldırılan önceki uygulama hangi yıl TEDAŞ Yönetim Kurulu tarafından onaylanmıştır?", options: ["2011", "2013", "2015", "2017"], answer: 1 },
+		  { question: "Yürürlükten kaldırılan esasların adı aşağıdakilerden hangisidir?", options: ["Kamulaştırma Yönetmeliği", "Uygulama Talimatnamesi", "6446 Sayılı Kanun Gereği Uygulama Esasları", "Dağıtım Tesisleri İmar Prosedürü"], answer: 2 },
+		  { question: "Bu Usul ve Esaslar kim tarafından yürütülür?", options: ["Enerji Bakanı", "TEDAŞ Yönetim Kurulu", "TEDAŞ Genel Müdürü", "Taşra Müdürü"], answer: 2 },
+		  { question: "TEDAŞ tarafından yayımlanan teknik şartname aşağıdakilerden hangisiyle ilgilidir?", options: ["Tarım analizleri", "Kamulaştırma haritası ve plan tadilatı", "Orman izin belgeleri", "İmar planları"], answer: 1 },
+		  { question: "Merkez Birimi hangi durumda Cumhurbaşkanlığına başvurur?", options: ["Kamulaştırma reddedildiğinde", "Devir işlemi tamamlandığında", "Acele kamulaştırma talebinde", "Tescil yapılamadığında"], answer: 2 },
+		  { question: "Kıymet takdir komisyonu raporlarını onaylayan mühendis grubu aşağıdakilerden hangisidir?", options: ["Harita ve elektrik", "Harita ve ziraat / Harita ve inşaat", "Ziraat ve makine", "Jeoloji ve inşaat"], answer: 1 },
+		  { question: "Şirketin hazırladığı çağrı yazıları resmi hale kim tarafından getirilir?", options: ["Merkez Birimi", "Taşra Birimi", "Belediye", "Enerji Bakanlığı"], answer: 1 },
+		  { question: "Adres tespiti 20 iş günü içinde yapılamazsa hangi yola başvurulur?", options: ["Mahalleye tebligat", "Doğrudan davet", "İlanen tebligat", "SMS ile bildirim"], answer: 2 },
+		  { question: "TEDAŞ adına tapuda tescil işlemleri için belgeler kim tarafından hazırlanır?", options: ["Tapu Müdürlüğü", "Belediye", "Taşra Birimi", "Merkez Birimi"], answer: 2 },
+		  { question: "Kamulaştırma bedelleri hangi kaynak üzerinden ödenir?", options: ["Belediye bütçesi", "Devlet katkısı", "Şirket ödemesi", "TEDAŞ öz kaynakları"], answer: 2 },
+		  { question: "Devletin hüküm ve tasarrufu altındaki taşınmazlarda işlemler kimin yürütümündedir?", options: ["Taşra Birimi", "Kadastro", "Şirket", "Merkez Birimi"], answer: 2 },
+		  { question: "Kadastro kontrol ve tescil süreçlerini kim birlikte takip eder?", options: ["Şirket ve Taşra Birimi", "Belediye ve TEDAŞ", "EPDK ve Merkez Birim", "Kadastro ve Tapu"], answer: 0 },
+		  { question: "TEDAŞ sabit kıymet defteri için belgeler hangi birimlere gönderilir?", options: ["Taşra Müdürlüğü ve Belediye", "Mali İşler, Varlık Yönetimi ve Denetim Dairesi", "Enerji Bakanlığı ve TEDAŞ", "EPDK ve Belediye"], answer: 1 },
+		  { question: "Hak tesis işlemleri için ilgili Milli Emlak Müdürlüğüne yazı gönderen kimdir?", options: ["Şirket", "Merkez Birim", "Taşra Birimi", "Belediye"], answer: 2 },
+		  { question: "Taahhüt senedi ve saha teslim tutanakları toplam kaç nüsha hazırlanır?", options: ["3", "4", "5", "6"], answer: 2 },
+		  { question: "İlanen tebligat işlemi hangi kanunun hangi maddesine kıyasen yapılır?", options: ["2942 / 10. madde", "5403 / 14. madde", "6831 / 6. madde", "3194 / 18. madde"], answer: 0 },
+		  { question: "Kamulaştırma sürecinde uzlaşma komisyonunca hazırlanan tutanak kiminle imzalanır?", options: ["Belediye Başkanı", "Taşra Müdürü", "Taşınmaz maliki", "Enerji Uzmanı"], answer: 2 },
+		  { question: "Şirketin ödeme yükümlülüğü doğduğunda bunu 5 gün içinde hangi faizle ödemelidir?", options: ["Basit faiz", "Avans faizi", "Reeskont faizi", "Acil durum faizi"], answer: 1 },
+		  { question: "TEDAŞ Yönetim Kurulu tarafından onaylanan Usul ve Esaslar hangi tarihte yürürlüğe girdi?", options: ["02.11.2021", "22.08.2013", "01.01.2022", "29.07.2016"], answer: 0 },
+		  { question: "Usul ve Esasları uygulamakla yetkili yürütücü kimdir?", options: ["Enerji Bakanı", "TEDAŞ Genel Müdürü", "Şirket Yetkilisi", "Taşra Müdürü"], answer: 1 },
+		  { question: "Şirketin hazırladığı kıymet takdir raporu kaç tür taşınmazı kapsar?", options: ["Arsa ve arazi", "Sadece arazi", "Sadece arsa", "Sadece tapusuz mülk"], answer: 0 },
+		  { question: "TEDAŞ Orman İzin Takip programına hangi belgeler girilir?", options: ["Orman bilgi formu, izin oluru, ödeme dekontu ve saha teslim tutanağı", "Tapu örneği ve adres beyanı", "Uzlaşma tutanağı ve kıymet raporu", "Kadastro haritası ve imar paftası"], answer: 0 },
+		  { question: "Kamu kurumlarına ait taşınmazların devir bedelleri kim tarafından ödenir?", options: ["Taşra Birimi", "TEDAŞ", "Şirket", "Bakanlık"], answer: 2 },
+		  { question: "Kamulaştırma haritalarının eksiksiz olması durumunda onayı kim verir?", options: ["Belediye", "Taşra Birimi", "Şirket", "Merkez Birimi"], answer: 1 },
+		  { question: "2942 sayılı Kamulaştırma Kanunu hangi tür taşınmazlar için uygulanır?", options: ["Hazine arazileri", "Özel mülkiyet", "Orman arazileri", "Tarım arazileri"], answer: 1 },
+		  { question: "İlanen tebligat yapılabilmesi için öncelikle ne yapılmalıdır?", options: ["MERNİS adres sorgusu yapılmalıdır", "Uzlaşma çağrısı yapılmalıdır", "Şirketten onay alınmalıdır", "EPDK'dan izin alınmalıdır"], answer: 0 },
+		  { question: "Kıymet takdir raporları hangi çalışmalardan sonra hazırlanır?", options: ["Mali analiz ve yazışmalar", "Kadastro ve tapu kontrolü", "Büro ve arazi çalışmaları", "İmar planı onayı"], answer: 2 },
+		  { question: "Muvafakat alınamayan kamu taşınmazları için hangi süreç başlatılır?", options: ["Belediye tahsis süreci", "Danıştay ve Asliye Hukuk Mahkemesi süreci", "Valilik onayı", "İl Özel İdare itirazı"], answer: 1 },
+		  { question: "Muvafakat talebi hangi kanunun 30. maddesine göre yapılır?", options: ["Kamulaştırma Kanunu", "İmar Kanunu", "Orman Kanunu", "Toprak Koruma Kanunu"], answer: 0 },
+		  { question: "Hak tesisi sürecinde ilgili kurum hangi bilgiye sahip olmalıdır?", options: ["Tapu tahsis numarası", "TEDAŞ karar sureti", "Orman amenajman haritası", "Uzlaşma tutanağı"], answer: 1 },
+		  { question: "Taşınmazların maliklerine ait adresler hangi sistemden elde edilir?", options: ["TAKPAS", "EKAP", "MERKEZBİS", "MERNİS"], answer: 3 },
+		  { question: "Şirket tarafından yapılan pazarlık çağrısı hangi şekilde gönderilir?", options: ["Fax", "SMS", "İadeli taahhütlü posta", "Email"], answer: 2 },
+		  { question: "Uzlaşma tutanakları en az kaç adet hazırlanır?", options: ["1", "2", "3", "4"], answer: 1 },
+		  { question: "İlgili belediyenin imar planında yer tahsis işlemi hangi durumda zorunludur?", options: ["Kamulaştırma sonrası", "Yönetim Kurulu kararı öncesinde", "Tapu devri sonrasında", "Tescil tamamlandığında"], answer: 1 },
+		  { question: "Devlet hüküm ve tasarrufundaki taşınmazlar için hangi işlem yapılamaz?", options: ["Hak tesisi", "Kiralama", "Tapusuz kamulaştırma", "Kullanma izni"], answer: 2 },
+		  { question: "TEDAŞ'ın arşivinde saklanan belgelerden biri değildir?", options: ["Kamulaştırma harita dosyası", "Tasarruf evrakı", "İmar uygulama planı", "Plan tadilatı evrakı"], answer: 2 },
+		  { question: "Kamulaştırma işlemleri sonucunda oluşan sabit kıymetler hangi birime bildirilir?", options: ["Enerji Bakanlığı", "Varlık Yönetimi Dairesi", "İmar Dairesi", "Tapu Kadastro Genel Müdürlüğü"], answer: 1 },
+		  { question: "İmar planı içinde kalan alanlarda hangi kurum yer tahsisini sağlar?", options: ["İl Özel İdare", "Taşra Birimi", "Şirket", "Merkez Birimi"], answer: 2 },
+		  { question: "Kamu yararı kararı olmayan taşınmazlar için süreç nasıl işler?", options: ["Mahkemeye başvurulur", "Plan revizyonu yapılır", "Değerlendirme yapılmaz", "Bu esaslar çerçevesinde değerlendirilir"], answer: 3 },
+		  { question: "Kamulaştırma sırasında mahkeme kararı kim tarafından takip edilir?", options: ["Merkez Birimi", "Belediye", "Taşra Birimi", "Tapu Müdürü"], answer: 2 },
+		  { question: "Şirketin yatırım programındaki tesisler için hangi süreç başlatılır?", options: ["Kiralama", "Kamulaştırma", "Yıkım", "Tahliye"], answer: 1 },
+		  { question: "TEDAŞ Yönetim Kurulu kararı sonrası taşınmaz devri işlemleri hangi kurumda yapılır?", options: ["Belediye", "Kadastro ve Tapu Müdürlükleri", "Şirket", "Taşra Birimi"], answer: 1 },
+		  { question: "Yatırım programı kapsamındaki taşınmaz işlemlerinde hangi ayrım yapılmaz?", options: ["Kamu-özel ayrımı", "İmar planı ayrımı", "Tapu kayıt türü", "Mülkiyet tipi"], answer: 0 }
+		];
+
+        let currentQuestion = 0;
+        let score = 0;
+        const questionEl = document.getElementById("question");
+        const optionsEl = document.getElementById("options");
+        const resultEl = document.getElementById("result");
+        const nextBtn = document.getElementById("nextBtn");
+        const scoreBox = document.getElementById("scoreBox");
+
+        function loadQuestion() {
+            const allNavItems = document.querySelectorAll('#questionList li');
+            allNavItems.forEach((item, idx) => {
+                item.classList.remove('active');
+                if (idx === currentQuestion) {
+                    item.classList.add('active');
+                }
+            });
+
+            const questionList = document.getElementById("questionList");
+            if (questionList && questionList.children.length === 0) {
+                questions.forEach((q, i) => {
+                    const li = document.createElement("li");
+                    li.textContent = `Soru ${i + 1}`;
+                    li.onclick = () => {
+                        currentQuestion = i;
+                        loadQuestion();
+                    };
+                    questionList.appendChild(li);
+                });
+            }
+
+            const q = questions[currentQuestion];
+            questionEl.textContent = `Soru ${currentQuestion + 1}: ${q.question}`;
+            optionsEl.innerHTML = "";
+            resultEl.textContent = "";
+            nextBtn.style.display = "none";
+            scoreBox.textContent = `Puan: ${score} / ${questions.length}`;
+
+            q.options.forEach((opt, index) => {
+                const li = document.createElement("li");
+                const btn = document.createElement("button");
+                btn.textContent = `${harfler[index]}) ${opt}`;
+                btn.onclick = () => checkAnswer(index, btn);
+                li.appendChild(btn);
+                optionsEl.appendChild(li);
+            });
+        }
+
+        function checkAnswer(selected, btnClicked) {
+            const q = questions[currentQuestion];
+            const buttons = document.querySelectorAll(".options button");
+
+            buttons.forEach((btn, idx) => {
+                btn.disabled = true;
+                btn.classList.remove("correct", "incorrect");
+                if (idx === q.answer) {
+                    btn.classList.add("correct");
+                }
+            });
+
+            if (selected === q.answer) {
+                score++;
+                resultEl.textContent = "Doğru cevap!";
+                resultEl.className = "result correct";
+            } else {
+                resultEl.textContent = "Yanlış cevap.";
+                resultEl.className = "result incorrect";
+                btnClicked.classList.add("incorrect");
+            }
+
+            nextBtn.style.display = "inline-block";
+            scoreBox.textContent = `Puan: ${score} / ${questions.length}`;
+        }
+
+        nextBtn.onclick = () => {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+            } else {
+                questionEl.textContent = "Test tamamlandı!";
+                optionsEl.innerHTML = "";
+                nextBtn.style.display = "none";
+                resultEl.textContent = `Tebrikler! ${score} / ${questions.length} doğru cevap verdiniz.`;
+                resultEl.className = "result correct";
+            }
+        };
+
+        loadQuestion();
+    </script>
+</body>
+
+</html>
